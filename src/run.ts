@@ -88,7 +88,8 @@ export async function runPublish({
     [
       "workspaces",
       "foreach",
-      "-itv",
+      "-iv",
+      "--topological-dev",
       "--no-private",
       "npm",
       "publish",
