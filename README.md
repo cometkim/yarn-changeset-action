@@ -19,6 +19,8 @@ This action for [Changesets](https://github.com/atlassian/changesets) creates a 
 - `version` - The command to update version, edit CHANGELOG, read and delete changesets. Default to `yarn changeset version` if not provided
 - `commit` - The commit message to use. Default to `Version Packages`
 - `title` - The pull request title. Default to `Version Packages`
+- `setupGitUser` - Sets up the git user for commits as `"github-actions[bot]"`. Default to `true`
+- `cwd` - Changes node's `process.cwd()` if the project is not located on the root. Default to `process.cwd()`
 
 ### Outputs
 
@@ -62,7 +64,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Create Release Pull Request
-        uses: cometkim/yarn-changeset-action@master
+        uses: cometkim/yarn-changeset-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -103,7 +105,7 @@ jobs:
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: cometkim/yarn-changeset-action@master
+        uses: cometkim/yarn-changeset-action@v1
         with:
           autoPublish: true
         env:
@@ -152,7 +154,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Create Release Pull Request
-        uses: cometkim/yarn-changeset-version@master
+        uses: cometkim/yarn-changeset-version@v1
         with:
           # this expects you to have a npm script called version that runs some logic and then calls `yarn changeset version`.
           version: yarn version

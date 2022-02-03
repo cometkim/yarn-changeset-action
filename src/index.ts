@@ -1,5 +1,4 @@
 import * as core from "@actions/core";
-import { exec } from "@actions/exec";
 import fs from "fs-extra";
 import * as gitUtils from "./gitUtils";
 import { runPublish, runVersion } from "./run";
@@ -16,14 +15,24 @@ const getOptionalInput = (name: string) => core.getInput(name) || undefined;
     return;
   }
 
-  console.log("setting git user");
-  await gitUtils.setupUser();
+  let setupGitUser = core.getBooleanInput("setupGitUser");
+
+  if (setupGitUser) {
+    console.log("setting git user");
+    await gitUtils.setupUser();
+  }
 
   console.log("setting GitHub credentials");
   await fs.writeFile(
     `${process.env.HOME}/.netrc`,
     `machine github.com\nlogin github-actions[bot]\npassword ${githubToken}`
   );
+
+  const inputCwd = core.getInput("cwd");
+  if (inputCwd) {
+    console.log("changing directory to the one given as the input");
+    process.chdir(inputCwd);
+  }
 
   let { changesets } = await readChangesetState();
 
@@ -58,6 +67,7 @@ const getOptionalInput = (name: string) => core.getInput(name) || undefined;
       const result = await runPublish({
         npmToken,
         githubToken,
+        createGithubReleases: core.getBooleanInput("createGithubReleases"),
       });
 
       if (result.published) {

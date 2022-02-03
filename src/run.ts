@@ -3,7 +3,6 @@ import * as github from "@actions/github";
 import fs from "fs-extra";
 import { getPackages, Package } from "@manypkg/get-packages";
 import path from "path";
-import * as semver from "semver";
 import {
   getChangelogEntry,
   execWithOutput,
@@ -51,6 +50,7 @@ const createRelease = async (
 type PublishOptions = {
   npmToken: string;
   githubToken: string;
+  createGithubReleases: boolean;
   cwd?: string;
 };
 
@@ -68,6 +68,7 @@ type PublishResult =
 export async function runPublish({
   npmToken,
   githubToken,
+  createGithubReleases,
   cwd = process.cwd(),
 }: PublishOptions): Promise<PublishResult> {
   let octokit = github.getOctokit(githubToken);
@@ -99,7 +100,8 @@ export async function runPublish({
   );
 
 
-  let { packages, tool } = await getPackages(cwd);
+  let { tool } = await getPackages(cwd);
+
   if (tool !== "yarn") {
     throw new Error("Only Yarn is supported");
   }
