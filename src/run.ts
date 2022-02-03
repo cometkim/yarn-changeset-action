@@ -76,7 +76,7 @@ export async function runPublish({
   await exec(
     "yarn",
     [
-      "config"
+      "config",
       "set",
       "npmAuthToken",
       npmToken,
