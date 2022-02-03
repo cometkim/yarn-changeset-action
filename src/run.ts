@@ -3,6 +3,7 @@ import * as github from "@actions/github";
 import fs from "fs-extra";
 import { getPackages, Package } from "@manypkg/get-packages";
 import path from "path";
+import * as semver from "semver";
 import {
   getChangelogEntry,
   execWithOutput,
@@ -120,14 +121,16 @@ export async function runPublish({
     publishedPackages.push(pkg);
   }
 
-  await Promise.all(
-    publishedPackages.map((pkg) =>
-      createRelease(octokit, {
-        pkg,
-        tagName: `${pkg.packageJson.name}@${pkg.packageJson.version}`,
-      })
-    )
-  );
+  if (createGithubReleases) {
+    await Promise.all(
+      publishedPackages.map((pkg) =>
+        createRelease(octokit, {
+          pkg,
+          tagName: `${pkg.packageJson.name}@${pkg.packageJson.version}`,
+        })
+      )
+    );
+  }
 
   if (publishedPackages.length) {
     return {
@@ -156,7 +159,6 @@ const requireChangesetsCliPkgJson = (cwd: string) => {
 };
 
 type VersionOptions = {
-  script: string;
   githubToken: string;
   cwd?: string;
   prTitle?: string;
@@ -166,7 +168,6 @@ type VersionOptions = {
 };
 
 export async function runVersion({
-  script,
   githubToken,
   cwd = process.cwd(),
   prTitle = "Version Packages",
@@ -185,8 +186,11 @@ export async function runVersion({
 
   let versionsByDirectory = await getVersionsByDirectory(cwd);
 
-  let [versionCommand, ...versionArgs] = script.split(/\s+/);
-  await exec(versionCommand, versionArgs, { cwd });
+  let changesetsCliPkgJson = requireChangesetsCliPkgJson(cwd);
+    let cmd = semver.lt(changesetsCliPkgJson.version, "2.0.0")
+      ? "bump"
+      : "version";
+  await exec("yarn", ["changeset", cmd], { cwd });
 
   // update lock file
   await exec("yarn", ["config", "set", "enableImmutableInstalls", "false"], { cwd });
