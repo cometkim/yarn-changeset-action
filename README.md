@@ -16,7 +16,6 @@ This action for [Changesets](https://github.com/atlassian/changesets) creates a 
 
 - `autoPublish` - The flag to enable auto-publishing packages. Default to `false`
 - `dedupe` - The flag to enable auto-deduplication of dependencies. Default to `false`
-- `version` - The command to update version, edit CHANGELOG, read and delete changesets. Default to `yarn changeset version` if not provided
 - `commit` - The commit message to use. Default to `Version Packages`
 - `title` - The pull request title. Default to `Version Packages`
 - `setupGitUser` - Sets up the git user for commits as `"github-actions[bot]"`. Default to `true`
@@ -116,48 +115,4 @@ jobs:
         if: steps.changesets.outputs.published == 'true'
         # You can do something when a publish happens.
         run: my-slack-bot send-notification --message "A new version of ${GITHUB_REPOSITORY} was published!"
-```
-
-#### With version script
-
-If you need to add additional logic to the version command, you can do so by using a version script.
-
-If the version script is present, this action will run that script instead of `yarn changeset version`, so please make sure that your script calls `yarn changeset version` at some point. All the changes made by the script will be included in the PR.
-
-```yml
-name: Release
-
-on:
-  push:
-    branches:
-      - master
-
-jobs:
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js 16.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: 16.x
-
-      - name: Install Dependencies
-        run: yarn install --immutable
-
-      - name: Create Release Pull Request
-        uses: cometkim/yarn-changeset-version@v1
-        with:
-          # this expects you to have a npm script called version that runs some logic and then calls `yarn changeset version`.
-          version: yarn version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```

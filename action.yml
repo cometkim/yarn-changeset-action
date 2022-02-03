@@ -12,10 +12,6 @@ inputs:
     description: "A boolean value to enable auto deduplication"
     required: false
     default: "false"
-  version:
-    description: "The command to update version, edit CHANGELOG, read and delete changesets. Default to `yarn changeset version` if not provided"
-    required: false
-    default: "yarn changeset version"
   cwd:
     description: Sets the cwd for the node process. Default to `process.cwd()`
     required: false
