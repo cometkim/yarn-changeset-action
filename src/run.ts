@@ -193,8 +193,12 @@ export async function runVersion({
   await exec("yarn", ["changeset", cmd], { cwd });
 
   // update lock file
-  await exec("yarn", ["config", "set", "enableImmutableInstalls", "false"], { cwd });
-  await exec("yarn", ["install", "--mode=update-lockfile"], { cwd });
+  await exec("yarn", [
+    "install",
+    "--mode=update-lockfile",
+    "--no-immutable",
+  ], { cwd });
+
   if (dedupe) {
     await exec("yarn", ["dedupe"], { cwd });
   }
