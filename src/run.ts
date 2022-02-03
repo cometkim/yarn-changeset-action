@@ -162,6 +162,7 @@ type VersionOptions = {
   prTitle?: string;
   commitMessage?: string;
   autoPublish?: boolean;
+  dedupe?: boolean;
 };
 
 export async function runVersion({
