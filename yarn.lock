@@ -4516,10 +4516,10 @@ ms@2.1.2, ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-nanobundle@^0.0.23:
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/nanobundle/-/nanobundle-0.0.23.tgz#609d73f81e1d8938a8aef6185affcdace1fdda62"
-  integrity sha512-9exiXXkDjfy8fuI8QDkZg8uJ5+pYV1JjZIWn3KlAWA1xVbJhP/3VTMBncfMVtgP1D3Z82NYWeALB8nNYSsRvww==
+nanobundle@^0.0.24:
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/nanobundle/-/nanobundle-0.0.24.tgz#3aa8228cae1e68a8f7e56e170dab963aa2fb44c7"
+  integrity sha512-u3GYeo1PC8L3HwUc/cEoWjhb5x2qmFPD9vt4A0HYHx51qvyRgpK6cxkTkHqoG+S0Kg27qF4/c2nWvxj9w27rCg==
   dependencies:
     browserslist "^4.19.1"
     esbuild "^0.14.20"
