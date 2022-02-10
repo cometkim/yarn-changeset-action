@@ -42,7 +42,7 @@ const createRelease = async (
     });
   } catch (err) {
     // if we can't find a changelog, the user has probably disabled changelogs
-    if (err.code !== "ENOENT") {
+    if ((err as any)?.code !== "ENOENT") {
       throw err;
     }
   }
@@ -107,18 +107,16 @@ export async function runPublish({
     throw new Error("Only Yarn is supported");
   }
 
-  let publishedPattern = /\[(.+)\]:.*Package archive published/;
+  let publishedPattern = /\[(?<packageName>.+)\]:.*Package archive published/;
   let publishedPackages: Package[] = [];
 
   let lines = changesetPublishOutput.stdout.split("\n");
   for (let line of lines) {
-    let match = line.match(publishedPattern);
-    if (match === null) {
-      continue;
+    let packageName = line.match(publishedPattern)?.groups?.['packageName'];
+    if (packageName) {
+      let pkg = require(packageName + '/package.json');
+      publishedPackages.push(pkg);
     }
-    let pkgName = match[1];
-    let pkg = require(pkgName + '/package.json');
-    publishedPackages.push(pkg);
   }
 
   if (createGithubReleases) {
@@ -149,7 +147,7 @@ const requireChangesetsCliPkgJson = (cwd: string) => {
   try {
     return require(resolveFrom(cwd, "@changesets/cli/package.json"));
   } catch (err) {
-    if (err && err.code === "MODULE_NOT_FOUND") {
+    if ((err as any)?.code === "MODULE_NOT_FOUND") {
       throw new Error(
         `Have you forgotten to install \`@changesets/cli\` in "${cwd}"?`
       );
