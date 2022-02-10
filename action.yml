@@ -2,7 +2,7 @@ name: Changesets
 description: A GitHub action to automate releases with Changesets
 runs:
   using: "node12"
-  main: "dist/index.js"
+  main: "dist/index.cjs"
 inputs:
   autoPublish:
     description: "A boolean value to enable auto publishing"
