@@ -49,5 +49,8 @@
   "husky": {
     "hooks": {}
   },
-  "prettier": {}
+  "prettier": {},
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }
