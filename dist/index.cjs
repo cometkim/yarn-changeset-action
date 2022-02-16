@@ -45604,6 +45604,7 @@ async function runVersion({
   let branch = github.context.ref.replace("refs/heads/", "");
   let versionBranch = `changeset-release/${branch}`;
   let octokit = github.getOctokit(githubToken);
+  console.log(octokit);
   let { preState } = await readChangesetState(cwd);
   await switchToMaybeExistingBranch(versionBranch);
   await reset(github.context.sha);
