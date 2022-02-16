@@ -105,7 +105,7 @@ export async function runPublish({
     throw new Error("Only Yarn is supported");
   }
 
-  let publishedPattern = /\[(?<packageName>.+)\]:.*Package archive published/;
+  let publishedPattern = /\[(?<packageName>[^\[]+)\]:.*Package archive published/;
   let publishedPackages: Package[] = [];
 
   let lines = changesetPublishOutput.stdout.split("\n");
