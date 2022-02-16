@@ -13,7 +13,6 @@ import {
 } from "./utils";
 import * as gitUtils from "./gitUtils";
 import readChangesetState from "./readChangesetState";
-import resolveFrom from "resolve-from";
 
 const createRelease = async (
   octokit: ReturnType<typeof github.getOctokit>,
@@ -33,10 +32,10 @@ const createRelease = async (
       );
     }
 
-    await octokit.repos.createRelease({
+    await octokit.rest.repos.createRelease({
       name: tagName,
       tag_name: tagName,
-      body: changelogEntry.content,
+      body: changelogEntry.content as string,
       prerelease: pkg.packageJson.version.includes("-"),
       ...github.context.repo,
     });
@@ -178,7 +177,6 @@ export async function runVersion({
   let branch = github.context.ref.replace("refs/heads/", "");
   let versionBranch = `changeset-release/${branch}`;
   let octokit = github.getOctokit(githubToken);
-  console.log(octokit);
   let { preState } = await readChangesetState(cwd);
 
   await gitUtils.switchToMaybeExistingBranch(versionBranch);
@@ -204,7 +202,7 @@ export async function runVersion({
   }
 
   let searchQuery = `repo:${repo}+state:open+head:${versionBranch}+base:${branch}`;
-  let searchResultPromise = octokit.search.issuesAndPullRequests({
+  let searchResultPromise = octokit.rest.search.issuesAndPullRequests({
     q: searchQuery,
   });
   let changedPackages = await getChangedPackages(cwd, versionsByDirectory);
@@ -274,7 +272,7 @@ ${
   console.log(JSON.stringify(searchResult.data, null, 2));
   if (searchResult.data.items.length === 0) {
     console.log("creating pull request");
-    await octokit.pulls.create({
+    await octokit.rest.pulls.create({
       base: branch,
       head: versionBranch,
       title: finalPrTitle,
@@ -282,7 +280,7 @@ ${
       ...github.context.repo,
     });
   } else {
-    octokit.pulls.update({
+    octokit.rest.pulls.update({
       pull_number: searchResult.data.items[0].number,
       title: finalPrTitle,
       body: await prBodyPromise,

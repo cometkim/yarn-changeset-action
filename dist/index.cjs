@@ -45514,7 +45514,7 @@ var createRelease = async (octokit, { pkg, tagName }) => {
     if (!changelogEntry) {
       throw new Error(`Could not find changelog entry for ${pkg.packageJson.name}@${pkg.packageJson.version}`);
     }
-    await octokit.repos.createRelease(__spreadValues({
+    await octokit.rest.repos.createRelease(__spreadValues({
       name: tagName,
       tag_name: tagName,
       body: changelogEntry.content,
@@ -45604,7 +45604,6 @@ async function runVersion({
   let branch = github.context.ref.replace("refs/heads/", "");
   let versionBranch = `changeset-release/${branch}`;
   let octokit = github.getOctokit(githubToken);
-  console.log(octokit);
   let { preState } = await readChangesetState(cwd);
   await switchToMaybeExistingBranch(versionBranch);
   await reset(github.context.sha);
@@ -45621,7 +45620,7 @@ async function runVersion({
     await (0, import_exec3.exec)("yarn", ["dedupe"], { cwd });
   }
   let searchQuery = `repo:${repo}+state:open+head:${versionBranch}+base:${branch}`;
-  let searchResultPromise = octokit.search.issuesAndPullRequests({
+  let searchResultPromise = octokit.rest.search.issuesAndPullRequests({
     q: searchQuery
   });
   let changedPackages = await getChangedPackages(cwd, versionsByDirectory);
@@ -45657,14 +45656,14 @@ ${!!preState ? `
   console.log(JSON.stringify(searchResult.data, null, 2));
   if (searchResult.data.items.length === 0) {
     console.log("creating pull request");
-    await octokit.pulls.create(__spreadValues({
+    await octokit.rest.pulls.create(__spreadValues({
       base: branch,
       head: versionBranch,
       title: finalPrTitle,
       body: await prBodyPromise
     }, github.context.repo));
   } else {
-    octokit.pulls.update(__spreadValues({
+    octokit.rest.pulls.update(__spreadValues({
       pull_number: searchResult.data.items[0].number,
       title: finalPrTitle,
       body: await prBodyPromise
