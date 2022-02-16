@@ -36811,48 +36811,77 @@ var require_read_cjs = __commonJS({
   }
 });
 
-// node_modules/resolve-from/index.js
-var require_resolve_from = __commonJS({
-  "node_modules/resolve-from/index.js"(exports, module2) {
-    "use strict";
-    var path2 = require("path");
-    var Module = require("module");
-    var fs3 = require("fs");
-    var resolveFrom2 = (fromDirectory, moduleId, silent) => {
-      if (typeof fromDirectory !== "string") {
-        throw new TypeError(`Expected \`fromDir\` to be of type \`string\`, got \`${typeof fromDirectory}\``);
+// node_modules/@changesets/cli/package.json
+var require_package = __commonJS({
+  "node_modules/@changesets/cli/package.json"(exports, module2) {
+    module2.exports = {
+      name: "@changesets/cli",
+      version: "2.20.0",
+      description: "Organise your package versioning and publishing to make both contributors and maintainers happy",
+      bin: {
+        changeset: "bin.js"
+      },
+      repository: "https://github.com/changesets/changesets/tree/main/packages/cli",
+      files: [
+        "default-files",
+        "dist",
+        "bin.js",
+        "changelog"
+      ],
+      main: "dist/cli.cjs.js",
+      module: "dist/cli.esm.js",
+      author: "Changesets Contributors",
+      contributors: [
+        "Ben Conolly",
+        "Mitchell Hamilton",
+        "Mateusz Burzy\u0144ski <mateuszburzynski@gmail.com> (https://github.com/Andarist)"
+      ],
+      preconstruct: {
+        entrypoints: [
+          ".",
+          "changelog"
+        ]
+      },
+      license: "MIT",
+      dependencies: {
+        "@babel/runtime": "^7.10.4",
+        "@changesets/apply-release-plan": "^5.0.4",
+        "@changesets/assemble-release-plan": "^5.0.5",
+        "@changesets/config": "^1.6.4",
+        "@changesets/errors": "^0.1.4",
+        "@changesets/get-dependents-graph": "^1.3.0",
+        "@changesets/get-release-plan": "^3.0.5",
+        "@changesets/git": "^1.3.0",
+        "@changesets/logger": "^0.0.5",
+        "@changesets/pre": "^1.0.9",
+        "@changesets/read": "^0.5.3",
+        "@changesets/types": "^4.0.2",
+        "@changesets/write": "^0.1.6",
+        "@manypkg/get-packages": "^1.1.3",
+        "@types/is-ci": "^3.0.0",
+        "@types/semver": "^6.0.0",
+        chalk: "^2.1.0",
+        enquirer: "^2.3.0",
+        "external-editor": "^3.1.0",
+        "fs-extra": "^7.0.1",
+        "human-id": "^1.0.2",
+        "is-ci": "^3.0.1",
+        meow: "^6.0.0",
+        outdent: "^0.5.0",
+        "p-limit": "^2.2.0",
+        "preferred-pm": "^3.0.0",
+        semver: "^5.4.1",
+        spawndamnit: "^2.0.0",
+        "term-size": "^2.1.0",
+        "tty-table": "^2.8.10"
+      },
+      devDependencies: {
+        "@changesets/parse": "*",
+        "@changesets/test-utils": "*",
+        fixturez: "^1.1.0",
+        "strip-ansi": "^5.2.0"
       }
-      if (typeof moduleId !== "string") {
-        throw new TypeError(`Expected \`moduleId\` to be of type \`string\`, got \`${typeof moduleId}\``);
-      }
-      try {
-        fromDirectory = fs3.realpathSync(fromDirectory);
-      } catch (error) {
-        if (error.code === "ENOENT") {
-          fromDirectory = path2.resolve(fromDirectory);
-        } else if (silent) {
-          return;
-        } else {
-          throw error;
-        }
-      }
-      const fromFile = path2.join(fromDirectory, "noop.js");
-      const resolveFileName = () => Module._resolveFilename(moduleId, {
-        id: fromFile,
-        filename: fromFile,
-        paths: Module._nodeModulePaths(fromDirectory)
-      });
-      if (silent) {
-        try {
-          return resolveFileName();
-        } catch (error) {
-          return;
-        }
-      }
-      return resolveFileName();
     };
-    module2.exports = (fromDirectory, moduleId) => resolveFrom2(fromDirectory, moduleId);
-    module2.exports.silent = (fromDirectory, moduleId) => resolveFrom2(fromDirectory, moduleId, true);
   }
 });
 
@@ -45477,7 +45506,6 @@ async function readChangesetState(cwd = process.cwd()) {
 }
 
 // src/run.ts
-var import_resolve_from = __toESM(require_resolve_from());
 var createRelease = async (octokit, { pkg, tagName }) => {
   try {
     let changelogFileName = import_path2.default.join(pkg.dir, "CHANGELOG.md");
@@ -45555,7 +45583,7 @@ async function runPublish({
 }
 var requireChangesetsCliPkgJson = (cwd) => {
   try {
-    return require((0, import_resolve_from.default)(cwd, "@changesets/cli/package.json"));
+    return require_package();
   } catch (err) {
     console.error(err);
     if ((err == null ? void 0 : err.code) === "MODULE_NOT_FOUND") {
