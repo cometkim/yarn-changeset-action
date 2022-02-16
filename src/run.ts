@@ -13,7 +13,6 @@ import {
 } from "./utils";
 import * as gitUtils from "./gitUtils";
 import readChangesetState from "./readChangesetState";
-import resolveFrom from "resolve-from";
 
 const createRelease = async (
   octokit: ReturnType<typeof github.getOctokit>,
@@ -52,7 +51,6 @@ type PublishOptions = {
   npmToken: string;
   githubToken: string;
   createGithubReleases: boolean;
-  cwd?: string;
 };
 
 type PublishedPackage = { name: string; version: string };
@@ -70,8 +68,8 @@ export async function runPublish({
   npmToken,
   githubToken,
   createGithubReleases,
-  cwd = process.cwd(),
 }: PublishOptions): Promise<PublishResult> {
+  let cwd = process.cwd();
   let octokit = github.getOctokit(githubToken);
 
   await exec(
@@ -143,13 +141,13 @@ export async function runPublish({
   return { published: false };
 }
 
-const requireChangesetsCliPkgJson = (cwd: string) => {
+const requireChangesetsCliPkgJson = () => {
   try {
-    return require(resolveFrom(cwd, "@changesets/cli/package.json"));
+    return require("@changesets/cli/package.json");
   } catch (err) {
     if ((err as any)?.code === "MODULE_NOT_FOUND") {
       throw new Error(
-        `Have you forgotten to install \`@changesets/cli\` in "${cwd}"?`
+        `Have you forgotten to install \`@changesets/cli\` in "${process.cwd()}"?`
       );
     }
     throw err;
@@ -158,7 +156,6 @@ const requireChangesetsCliPkgJson = (cwd: string) => {
 
 type VersionOptions = {
   githubToken: string;
-  cwd?: string;
   prTitle?: string;
   commitMessage?: string;
   autoPublish?: boolean;
@@ -167,12 +164,13 @@ type VersionOptions = {
 
 export async function runVersion({
   githubToken,
-  cwd = process.cwd(),
   prTitle = "Version Packages",
   commitMessage = "Version Packages",
   autoPublish = false,
   dedupe = false,
 }: VersionOptions) {
+  let cwd = process.cwd();
+
   let repo = `${github.context.repo.owner}/${github.context.repo.repo}`;
   let branch = github.context.ref.replace("refs/heads/", "");
   let versionBranch = `changeset-release/${branch}`;
@@ -184,7 +182,7 @@ export async function runVersion({
 
   let versionsByDirectory = await getVersionsByDirectory(cwd);
 
-  let changesetsCliPkgJson = requireChangesetsCliPkgJson(cwd);
+  let changesetsCliPkgJson = requireChangesetsCliPkgJson();
     let cmd = semver.lt(changesetsCliPkgJson.version, "2.0.0")
       ? "bump"
       : "version";
