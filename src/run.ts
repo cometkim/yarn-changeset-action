@@ -73,6 +73,11 @@ export async function runPublish({
   let cwd = process.cwd();
   let octokit = github.getOctokit(githubToken);
 
+  let { tool } = await getPackages(cwd);
+  if (tool !== "yarn") {
+    throw new Error("Only Yarn is supported");
+  }
+
   await exec(
     "yarn",
     [
@@ -82,20 +87,6 @@ export async function runPublish({
       npmToken,
     ],
     { cwd },
-  );
-
-  let workspacesOutput = await execWithOutput(
-    "yarn",
-    [
-      "workspaces",
-      "list",
-      "--json",
-    ],
-    { cwd },
-  );
-  let workspaces = new Map<string | undefined, string>(
-    JSON.parse(`[${workspacesOutput.stdout}]`)
-      .map(({ location, name }: { location: string, name: string }) => [name, location])
   );
 
   let changesetPublishOutput = await execWithOutput(
@@ -113,11 +104,7 @@ export async function runPublish({
     { cwd },
   );
 
-  let { tool } = await getPackages(cwd);
-
-  if (tool !== "yarn") {
-    throw new Error("Only Yarn is supported");
-  }
+  let { packages } = await getPackages(cwd);
 
   let publishedPattern = /\[(?<packageName>[^\[]+)\]:.*Package archive published/;
   let publishedPackages: Package[] = [];
@@ -125,24 +112,9 @@ export async function runPublish({
   let lines = changesetPublishOutput.stdout.split("\n");
   for (let line of lines) {
     let packageName = line.match(publishedPattern)?.groups?.['packageName'];
-    let packageLocation = workspaces.get(packageName);
-    if (packageName && packageLocation) {
-      let packageInfo = await execWithOutput(
-        "yarn",
-        [
-          "npm",
-          "info",
-          "--json",
-          packageName,
-        ],
-        { cwd },
-      );
-      let packageJson = JSON.parse(packageInfo.stdout);
-
-      publishedPackages.push({
-        dir: packageLocation,
-        packageJson,
-      });
+    let pkg = packages.find(pkg => pkg.packageJson.name === packageName);
+    if (pkg) {
+      publishedPackages.push(pkg);
     }
   }
 
