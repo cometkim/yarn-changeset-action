@@ -1,7 +1,8 @@
 import { exec } from "@actions/exec";
 import * as github from "@actions/github";
 import fs from "fs-extra";
-import { getPackages, Package } from "@manypkg/get-packages";
+import type { Package } from "@manypkg/get-packages";
+import { getPackages } from "@manypkg/get-packages";
 import path from "path";
 import * as semver from "semver";
 import {
@@ -83,6 +84,20 @@ export async function runPublish({
     { cwd },
   );
 
+  let workspacesOutput = await execWithOutput(
+    "yarn",
+    [
+      "workspaces",
+      "list",
+      "--json",
+    ],
+    { cwd },
+  );
+  let workspaces = new Map<string | undefined, string>(
+    JSON.parse(`[${workspacesOutput.stdout}]`)
+      .map(({ location, name }: { location: string, name: string }) => [name, location])
+  );
+
   let changesetPublishOutput = await execWithOutput(
     "yarn",
     [
@@ -98,7 +113,6 @@ export async function runPublish({
     { cwd },
   );
 
-
   let { tool } = await getPackages(cwd);
 
   if (tool !== "yarn") {
@@ -111,9 +125,24 @@ export async function runPublish({
   let lines = changesetPublishOutput.stdout.split("\n");
   for (let line of lines) {
     let packageName = line.match(publishedPattern)?.groups?.['packageName'];
-    if (packageName) {
-      let pkg = require(packageName + '/package.json');
-      publishedPackages.push(pkg);
+    let packageLocation = workspaces.get(packageName);
+    if (packageName && packageLocation) {
+      let packageInfo = await execWithOutput(
+        "yarn",
+        [
+          "npm",
+          "info",
+          "--json",
+          packageName,
+        ],
+        { cwd },
+      );
+      let packageJson = JSON.parse(packageInfo.stdout);
+
+      publishedPackages.push({
+        dir: packageLocation,
+        packageJson,
+      });
     }
   }
 
