@@ -34,7 +34,12 @@ export async function getChangedPackages(
   return [...changedPackages];
 }
 
-export function getChangelogEntry(changelog: string, version: string) {
+export type ChangelogEntry = {
+  content: string,
+  highestLevel: number,
+};
+
+export function getChangelogEntry(changelog: string, version: string): ChangelogEntry {
   let ast = unified().use(remarkParse).parse(changelog);
 
   let highestLevel: number = BumpLevels.dep;
@@ -81,7 +86,7 @@ export function getChangelogEntry(changelog: string, version: string) {
     );
   }
   return {
-    content: unified().use(remarkStringify).stringify(ast),
+    content: unified().use(remarkStringify).stringify(ast) as string,
     highestLevel: highestLevel,
   };
 }

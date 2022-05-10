@@ -1,18 +1,25 @@
 import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
 import fs from "fs-extra";
-import type { Package } from "@manypkg/get-packages";
-import { getPackages } from "@manypkg/get-packages";
+import { getPackages, type Package } from "@manypkg/get-packages";
 import path from "path";
 import * as semver from "semver";
+import { type PreState } from "@changesets/types";
 import {
   getChangelogEntry,
   getChangedPackages,
   sortTheThings,
   getVersionsByDirectory,
+  type ChangelogEntry,
 } from "./utils";
 import * as gitUtils from "./gitUtils";
 import readChangesetState from "./readChangesetState";
+
+// GitHub Issues/PRs messages have a max size limit on the
+// message body payload.
+// `body is too long (maximum is 65536 characters)`.
+// To avoid that, we ensure to cap the message to 60k chars.
+const MAX_CHARACTERS_PER_MESSAGE = 60000;
 
 const createRelease = async (
   octokit: ReturnType<typeof github.getOctokit>,
@@ -39,7 +46,7 @@ const createRelease = async (
       prerelease: pkg.packageJson.version.includes("-"),
       ...github.context.repo,
     });
-  } catch (err) {
+  } catch (err: any) {
     // if we can't find a changelog, the user has probably disabled changelogs
     if ((err as any)?.code !== "ENOENT") {
       throw err;
@@ -144,8 +151,8 @@ export async function runPublish({
 const requireChangesetsCliPkgJson = () => {
   try {
     return require("@changesets/cli/package.json");
-  } catch (err) {
-    if ((err as any)?.code === "MODULE_NOT_FOUND") {
+  } catch (err: any) {
+    if (err?.code === "MODULE_NOT_FOUND") {
       throw new Error(
         `Have you forgotten to install \`@changesets/cli\` in "${process.cwd()}"?`
       );
@@ -154,12 +161,82 @@ const requireChangesetsCliPkgJson = () => {
   }
 };
 
+type ChangedPackageInfo = ChangelogEntry & {
+  private: boolean;
+  header: string;
+};
+
+type GetMessageOptions = {
+  autoPublish: boolean;
+  branch: string;
+  changedPackagesInfo: ChangedPackageInfo[];
+  prBodyMaxCharacters: number;
+  preState?: PreState;
+};
+
+export async function getVersionPrBody({
+  autoPublish,
+  preState,
+  changedPackagesInfo,
+  prBodyMaxCharacters,
+  branch,
+}: GetMessageOptions) {
+  let messageHeader = `This PR was opened by the [Changesets release](https://github.com/changesets/action) GitHub action. When you're ready to do a release, you can merge this and ${
+    autoPublish
+      ? `the packages will be published to npm automatically`
+      : `publish to npm yourself or [setup this action to publish automatically](https://github.com/changesets/action#with-publishing)`
+  }. If you're not ready to do a release yet, that's fine, whenever you add more changesets to ${branch}, this PR will be updated.
+`;
+  let messagePrestate = !!preState
+    ? `⚠️⚠️⚠️⚠️⚠️⚠️
+
+\`${branch}\` is currently in **pre mode** so this branch has prereleases rather than normal releases. If you want to exit prereleases, run \`changeset pre exit\` on \`${branch}\`.
+
+⚠️⚠️⚠️⚠️⚠️⚠️
+`
+    : "";
+  let messageReleasesHeading = `# Releases`;
+
+  let fullMessage = [
+    messageHeader,
+    messagePrestate,
+    messageReleasesHeading,
+    ...changedPackagesInfo.map((info) => `${info.header}\n\n${info.content}`),
+  ].join("\n");
+
+  // Check that the message does not exceed the size limit.
+  // If not, omit the changelog entries of each package.
+  if (fullMessage.length > prBodyMaxCharacters) {
+    fullMessage = [
+      messageHeader,
+      messagePrestate,
+      messageReleasesHeading,
+      `\n> The changelog information of each package has been omitted from this message, as the content exceeds the size limit.\n`,
+      ...changedPackagesInfo.map((info) => `${info.header}\n\n`),
+    ].join("\n");
+  }
+
+  // Check (again) that the message is within the size limit.
+  // If not, omit all release content this time.
+  if (fullMessage.length > prBodyMaxCharacters) {
+    fullMessage = [
+      messageHeader,
+      messagePrestate,
+      messageReleasesHeading,
+      `\n> All release information have been omitted from this message, as the content exceeds the size limit.`,
+    ].join("\n");
+  }
+
+  return fullMessage;
+}
+
 type VersionOptions = {
   githubToken: string;
   prTitle?: string;
   commitMessage?: string;
   autoPublish?: boolean;
   dedupe?: boolean;
+  prBodyMaxCharacters?: number;
 };
 
 type RunVersionResult = {
@@ -172,6 +249,7 @@ export async function runVersion({
   commitMessage = "Version Packages",
   autoPublish = false,
   dedupe = false,
+  prBodyMaxCharacters = MAX_CHARACTERS_PER_MESSAGE,
 }: VersionOptions): Promise<RunVersionResult> {
   let cwd = process.cwd();
 
@@ -208,55 +286,19 @@ export async function runVersion({
     q: searchQuery,
   });
   let changedPackages = await getChangedPackages(cwd, versionsByDirectory);
-
-  let prBodyPromise = (async () => {
-    return (
-      `This PR was opened by the [Changesets release](https://github.com/changesets/action) GitHub action. When you're ready to do a release, you can merge this and ${
-        autoPublish 
-          ? `the packages will be published to npm automatically`
-          : `publish to npm yourself or [setup this action to publish automatically](https://github.com/changesets/action#with-publishing)`
-      }. If you're not ready to do a release yet, that's fine, whenever you add more changesets to ${branch}, this PR will be updated.
-${
-  !!preState
-    ? `
-⚠️⚠️⚠️⚠️⚠️⚠️
-
-\`${branch}\` is currently in **pre mode** so this branch has prereleases rather than normal releases. If you want to exit prereleases, run \`changeset pre exit\` on \`${branch}\`.
-
-⚠️⚠️⚠️⚠️⚠️⚠️
-`
-    : ""
-}
-# Releases
-` +
-      (
-        await Promise.all(
-          changedPackages.map(async (pkg) => {
-            let changelogContents = await fs.readFile(
-              path.join(pkg.dir, "CHANGELOG.md"),
-              "utf8"
-            );
-
-            let entry = getChangelogEntry(
-              changelogContents,
-              pkg.packageJson.version
-            );
-            return {
-              highestLevel: entry.highestLevel,
-              private: !!pkg.packageJson.private,
-              content:
-                `## ${pkg.packageJson.name}@${pkg.packageJson.version}\n\n` +
-                entry.content,
-            };
-          })
-        )
-      )
-        .filter((x) => x)
-        .sort(sortTheThings)
-        .map((x) => x.content)
-        .join("\n ")
-    );
-  })();
+  let changedPackagesInfoPromises = Promise.all(
+    changedPackages.map(async (pkg): Promise<ChangedPackageInfo> => {
+      let changelogContents = await fs.readFile(
+        path.join(pkg.dir, "CHANGELOG.md"),
+        "utf8"
+      );
+      return {
+        ...getChangelogEntry(changelogContents, pkg.packageJson.version),
+        private: !!pkg.packageJson.private,
+        header: `## ${pkg.packageJson.name}@${pkg.packageJson.version}`,
+      };
+    })
+  );
 
   const finalPrTitle = `${prTitle}${!!preState ? ` (${preState.tag})` : ""}`;
 
@@ -272,6 +314,19 @@ ${
 
   let searchResult = await searchResultPromise;
   console.log(JSON.stringify(searchResult.data, null, 2));
+
+  const changedPackagesInfo = (await changedPackagesInfoPromises)
+    .filter(Boolean)
+    .sort(sortTheThings);
+
+  let prBody = await getVersionPrBody({
+    autoPublish,
+    preState,
+    branch,
+    changedPackagesInfo,
+    prBodyMaxCharacters,
+  });
+
   if (searchResult.data.items.length === 0) {
     console.log("creating pull request");
 
@@ -279,7 +334,7 @@ ${
       base: branch,
       head: versionBranch,
       title: finalPrTitle,
-      body: await prBodyPromise,
+      body: prBody,
       ...github.context.repo,
     });
 
@@ -292,9 +347,9 @@ ${
     console.log(`updating found pull request #${pullRequest.number}`);
 
     await octokit.rest.pulls.update({
-      pull_number: searchResult.data.items[0].number,
+      pull_number: pullRequest.number,
       title: finalPrTitle,
-      body: await prBodyPromise,
+      body: prBody,
       ...github.context.repo,
     });
 

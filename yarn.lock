@@ -1613,6 +1613,7 @@ __metadata:
     "@changesets/cli": ^2.20.0
     "@changesets/pre": ^1.0.9
     "@changesets/read": ^0.5.3
+    "@changesets/types": ^5.2.1
     "@changesets/write": ^0.1.6
     "@manypkg/get-packages": ^1.1.3
     "@types/fs-extra": ^11.0.1
@@ -1856,6 +1857,13 @@ __metadata:
   version: 4.0.2
   resolution: "@changesets/types@npm:4.0.2"
   checksum: 098ed02b44ac70dbe341ca3560acdd0ae46c54edb8a1134f743d5fa56bf983b5f4ea085b8c5187314c23ac51e51e1ca6c735aaaa3ee17d79f0395b23baf042a0
+  languageName: node
+  linkType: hard
+
+"@changesets/types@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "@changesets/types@npm:5.2.1"
+  checksum: 527dc1aa41b040fe35bcd55f7d07bec710320b179b000c429723e25b87aac18be487daf5047d4fecf2781aad78f73abff111e76e411b652f7a2e812a464c69f2
   languageName: node
   linkType: hard
 
