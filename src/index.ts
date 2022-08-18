@@ -40,18 +40,29 @@ const getOptionalInput = (name: string) => core.getInput(name) || undefined;
   let dedupe = core.getBooleanInput("dedupe");
   let hasChangesets = changesets.length !== 0;
 
+  const hasNonEmptyChangesets = changesets.some(
+    (changeset) => changeset.releases.length > 0
+  );
+
   core.setOutput("published", "false");
   core.setOutput("publishedPackages", "[]");
   core.setOutput("hasChangesets", String(hasChangesets));
 
   if (hasChangesets) {
-    await runVersion({
-      githubToken,
-      prTitle: getOptionalInput("title"),
-      commitMessage: getOptionalInput("commit"),
-      autoPublish,
-      dedupe,
-    });
+    if (hasNonEmptyChangesets) {
+      const { pullRequestNumber } = await runVersion({
+        githubToken,
+        prTitle: getOptionalInput("title"),
+        commitMessage: getOptionalInput("commit"),
+        autoPublish,
+        dedupe,
+      });
+      core.setOutput("pullRequestNumber", String(pullRequestNumber));
+      return;
+    } else {
+      console.log("All changesets are empty; not creating PR");
+      return;
+    }
   } else {
     console.log("No changesets found");
 

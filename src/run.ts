@@ -162,13 +162,17 @@ type VersionOptions = {
   dedupe?: boolean;
 };
 
+type RunVersionResult = {
+  pullRequestNumber: number;
+};
+
 export async function runVersion({
   githubToken,
   prTitle = "Version Packages",
   commitMessage = "Version Packages",
   autoPublish = false,
   dedupe = false,
-}: VersionOptions) {
+}: VersionOptions): Promise<RunVersionResult> {
   let cwd = process.cwd();
 
   let repo = `${github.context.repo.owner}/${github.context.repo.repo}`;
@@ -270,20 +274,32 @@ ${
   console.log(JSON.stringify(searchResult.data, null, 2));
   if (searchResult.data.items.length === 0) {
     console.log("creating pull request");
-    await octokit.rest.pulls.create({
+
+    const { data: pullRequest } = await octokit.rest.pulls.create({
       base: branch,
       head: versionBranch,
       title: finalPrTitle,
       body: await prBodyPromise,
       ...github.context.repo,
     });
+
+    return {
+      pullRequestNumber: pullRequest.number,
+    };
+
   } else {
-    octokit.rest.pulls.update({
+    const [pullRequest] = searchResult.data.items;
+    console.log(`updating found pull request #${pullRequest.number}`);
+
+    await octokit.rest.pulls.update({
       pull_number: searchResult.data.items[0].number,
       title: finalPrTitle,
       body: await prBodyPromise,
       ...github.context.repo,
     });
-    console.log("pull request found");
+
+    return {
+      pullRequestNumber: pullRequest.number,
+    };
   }
 }
