@@ -199,7 +199,7 @@ export async function runVersion({
     await exec("yarn", ["dedupe"], { cwd });
   }
 
-  let searchQuery = `repo:${repo}+state:open+head:${versionBranch}+base:${branch}`;
+  let searchQuery = `repo:${repo}+state:open+head:${versionBranch}+base:${branch}+is:pull-request`;
   let searchResultPromise = octokit.rest.search.issuesAndPullRequests({
     q: searchQuery,
   });
