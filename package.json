@@ -8,9 +8,9 @@
     "build": "nanobundle build --standalone --sourcemap=false"
   },
   "dependencies": {
-    "@actions/core": "^1.6.0",
-    "@actions/exec": "^1.1.0",
-    "@actions/github": "^5.0.0",
+    "@actions/core": "^1.10.0",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^5.1.1",
     "@changesets/pre": "^1.0.9",
     "@changesets/read": "^0.5.3",
     "@manypkg/get-packages": "^1.1.3",

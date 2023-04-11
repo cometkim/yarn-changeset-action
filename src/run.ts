@@ -1,4 +1,4 @@
-import { exec } from "@actions/exec";
+import { exec, getExecOutput } from "@actions/exec";
 import * as github from "@actions/github";
 import fs from "fs-extra";
 import type { Package } from "@manypkg/get-packages";
@@ -7,7 +7,6 @@ import path from "path";
 import * as semver from "semver";
 import {
   getChangelogEntry,
-  execWithOutput,
   getChangedPackages,
   sortTheThings,
   getVersionsByDirectory,
@@ -89,7 +88,7 @@ export async function runPublish({
     { cwd },
   );
 
-  let changesetPublishOutput = await execWithOutput(
+  let changesetPublishOutput = await getExecOutput(
     "yarn",
     [
       "workspaces",

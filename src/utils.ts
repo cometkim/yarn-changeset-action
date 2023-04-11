@@ -3,7 +3,6 @@ import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 // @ts-ignore
 import * as mdast from "mdast-util-to-string";
-import { exec } from "@actions/exec";
 import { getPackages, Package } from "@manypkg/get-packages";
 
 export const BumpLevels = {
@@ -84,32 +83,6 @@ export function getChangelogEntry(changelog: string, version: string) {
   return {
     content: unified().use(remarkStringify).stringify(ast),
     highestLevel: highestLevel,
-  };
-}
-
-export async function execWithOutput(
-  command: string,
-  args?: string[],
-  options?: { ignoreReturnCode?: boolean; cwd?: string }
-) {
-  let myOutput = "";
-  let myError = "";
-
-  return {
-    code: await exec(command, args, {
-      listeners: {
-        stdout: (data: Buffer) => {
-          myOutput += data.toString();
-        },
-        stderr: (data: Buffer) => {
-          myError += data.toString();
-        },
-      },
-
-      ...options,
-    }),
-    stdout: myOutput,
-    stderr: myError,
   };
 }
 
