@@ -26,6 +26,8 @@ This action for [Changesets](https://github.com/atlassian/changesets) creates a 
 
 - `published` - A boolean value to indicate whether a publishing is happened or not
 - `publishedPackages` - A JSON array to present the published packages. The format is `[{"name": "@xx/xx", "version": "1.2.0"}, {"name": "@xx/xy", "version": "0.8.9"}]`
+- `hasChangesets` - A boolean about whether there were changesets. Useful if you want to create your own publishing functionality.
+- `pullRequestNumber` - A numeric string to indicate created or updated pull request.
 
 ### Example workflow:
 
@@ -50,12 +52,13 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js 16.x
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18
+          cache: yarn
 
       - name: Install Dependencies
         run: yarn install --immutable
@@ -87,12 +90,13 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js 16.x
-        uses: actions/setup-node@v2
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18
+          cache: yarn
 
       - name: Install Dependencies
         run: yarn install --immutable
@@ -120,28 +124,38 @@ Note that you might need to account for things already being published in your s
 
 ```yml
 name: Release
+
 on:
   push:
     branches:
       - main
+
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v2
-      - name: Setup Node.js 12.x
-        uses: actions/setup-node@v2
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v3
         with:
-          node-version: 12.x
+          node-version: 18
+          cache: yarn
+
       - name: Install Dependencies
-        run: yarn
+        run: yarn install --immutable
+
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: cometkim/yarn-changeset-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish
         if: steps.changesets.outputs.hasChangesets == 'false'
         # You can do something when a publish should happen.
