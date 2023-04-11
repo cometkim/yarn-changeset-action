@@ -19,15 +19,15 @@ This action for [Changesets](https://github.com/atlassian/changesets) creates a 
 - `commit` - The commit message to use. Default to `Version Packages`
 - `title` - The pull request title. Default to `Version Packages`
 - `setupGitUser` - Sets up the git user for commits as `"github-actions[bot]"`. Default to `true`
-- createGithubReleases - A boolean value to indicate whether to create Github releases after `publish` or not. Default to `true`
+- `createGithubReleases` - A boolean value to indicate whether to create Github releases after `publish` or not. Default to `true`
 - `cwd` - Changes node's `process.cwd()` if the project is not located on the root. Default to `process.cwd()`
 
 ### Outputs
 
 - `published` - A boolean value to indicate whether a publishing is happened or not
 - `publishedPackages` - A JSON array to present the published packages. The format is `[{"name": "@xx/xx", "version": "1.2.0"}, {"name": "@xx/xy", "version": "0.8.9"}]`
-- `hasChangesets` - A boolean about whether there were changesets. Useful if you want to create your own publishing functionality.
-- `pullRequestNumber` - A numeric string to indicate created or updated pull request.
+- `hasChangesets` - A boolean about whether there were changesets
+- `pullRequestNumber` - A numeric string to indicate created or updated pull request
 
 ### Example workflow:
 
