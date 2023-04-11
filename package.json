@@ -1,6 +1,6 @@
 {
   "name": "@changesets/action",
-  "version": "1.3.4",
+  "version": "1.3.4-forked.0",
   "source": "src/index.ts",
   "main": "dist/index.cjs",
   "license": "MIT",
