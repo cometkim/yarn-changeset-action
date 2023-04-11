@@ -5,12 +5,7 @@
   "main": "dist/index.cjs",
   "license": "MIT",
   "scripts": {
-    "build": "nanobundle build --standalone --sourcemap=false",
-    "test": "jest",
-    "test:watch": "yarn test --watch",
-    "changeset": "changeset",
-    "bump": "node ./scripts/bump.js",
-    "release": "node ./scripts/release.js"
+    "build": "nanobundle build --standalone --sourcemap=false"
   },
   "dependencies": {
     "@actions/core": "^1.6.0",
@@ -33,18 +28,11 @@
     "@changesets/cli": "^2.20.0",
     "@changesets/write": "^0.1.6",
     "@types/fs-extra": "^11.0.1",
-    "@types/jest": "^29.5.0",
-    "@types/node": "^18.15.11",
     "@types/semver": "^7.3.13",
-    "babel-jest": "^27.5.1",
-    "fixturez": "^1.1.0",
     "fs-extra": "^8.1.0",
-    "jest": "^27.5.1",
     "nanobundle": "^0.0.24",
-    "prettier": "^2.0.5",
     "typescript": "^5.0.4"
   },
-  "prettier": {},
   "engines": {
     "node": ">=16.0.0"
   },
