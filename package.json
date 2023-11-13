@@ -1,6 +1,6 @@
 {
   "name": "@changesets/action",
-  "version": "1.4.1-forked.0",
+  "version": "1.4.1-forked.1",
   "main": "./dist/index.cjs",
   "license": "MIT",
   "scripts": {
