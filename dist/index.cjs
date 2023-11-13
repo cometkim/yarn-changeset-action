@@ -7571,16 +7571,16 @@ var require_semver = __commonJS({
       return compare(a, b, loose) !== 0;
     }
     __name(neq, "neq");
-    exports.gte = gte;
-    function gte(a, b, loose) {
+    exports.gte = gte2;
+    function gte2(a, b, loose) {
       return compare(a, b, loose) >= 0;
     }
-    __name(gte, "gte");
-    exports.lte = lte2;
-    function lte2(a, b, loose) {
+    __name(gte2, "gte");
+    exports.lte = lte;
+    function lte(a, b, loose) {
       return compare(a, b, loose) <= 0;
     }
-    __name(lte2, "lte");
+    __name(lte, "lte");
     exports.cmp = cmp;
     function cmp(a, op, b, loose) {
       switch (op) {
@@ -7605,11 +7605,11 @@ var require_semver = __commonJS({
         case ">":
           return gt(a, b, loose);
         case ">=":
-          return gte(a, b, loose);
+          return gte2(a, b, loose);
         case "<":
           return lt2(a, b, loose);
         case "<=":
-          return lte2(a, b, loose);
+          return lte(a, b, loose);
         default:
           throw new TypeError("Invalid operator: " + op);
       }
@@ -8136,14 +8136,14 @@ var require_semver = __commonJS({
       switch (hilo) {
         case ">":
           gtfn = gt;
-          ltefn = lte2;
+          ltefn = lte;
           ltfn = lt2;
           comp = ">";
           ecomp = ">=";
           break;
         case "<":
           gtfn = lt2;
-          ltefn = gte;
+          ltefn = gte2;
           ltfn = gt;
           comp = "<";
           ecomp = "<=";
@@ -28067,8 +28067,8 @@ var require_neq = __commonJS({
 var require_gte = __commonJS({
   "node_modules/semver/functions/gte.js"(exports, module2) {
     var compare = require_compare();
-    var gte = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) >= 0, "gte");
-    module2.exports = gte;
+    var gte2 = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) >= 0, "gte");
+    module2.exports = gte2;
   }
 });
 
@@ -28076,8 +28076,8 @@ var require_gte = __commonJS({
 var require_lte = __commonJS({
   "node_modules/semver/functions/lte.js"(exports, module2) {
     var compare = require_compare();
-    var lte2 = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) <= 0, "lte");
-    module2.exports = lte2;
+    var lte = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) <= 0, "lte");
+    module2.exports = lte;
   }
 });
 
@@ -28087,9 +28087,9 @@ var require_cmp = __commonJS({
     var eq = require_eq();
     var neq = require_neq();
     var gt = require_gt();
-    var gte = require_gte();
+    var gte2 = require_gte();
     var lt2 = require_lt();
-    var lte2 = require_lte();
+    var lte = require_lte();
     var cmp = /* @__PURE__ */ __name((a, op, b, loose) => {
       switch (op) {
         case "===":
@@ -28113,11 +28113,11 @@ var require_cmp = __commonJS({
         case ">":
           return gt(a, b, loose);
         case ">=":
-          return gte(a, b, loose);
+          return gte2(a, b, loose);
         case "<":
           return lt2(a, b, loose);
         case "<=":
-          return lte2(a, b, loose);
+          return lte(a, b, loose);
         default:
           throw new TypeError(`Invalid operator: ${op}`);
       }
@@ -29438,8 +29438,8 @@ var require_outside = __commonJS({
     var satisfies = require_satisfies();
     var gt = require_gt();
     var lt2 = require_lt();
-    var lte2 = require_lte();
-    var gte = require_gte();
+    var lte = require_lte();
+    var gte2 = require_gte();
     var outside = /* @__PURE__ */ __name((version, range, hilo, options) => {
       version = new SemVer(version, options);
       range = new Range(range, options);
@@ -29447,14 +29447,14 @@ var require_outside = __commonJS({
       switch (hilo) {
         case ">":
           gtfn = gt;
-          ltefn = lte2;
+          ltefn = lte;
           ltfn = lt2;
           comp = ">";
           ecomp = ">=";
           break;
         case "<":
           gtfn = lt2;
-          ltefn = gte;
+          ltefn = gte2;
           ltfn = gt;
           comp = "<";
           ecomp = "<=";
@@ -47886,7 +47886,7 @@ async function runPublish({
   }
   let changesetPublishResult = await (0, import_exec2.getExecOutput)(
     "yarn",
-    semver.lte(versionResult.stdout, "4.0.0") ? [
+    semver.gte(versionResult.stdout, "4.0.0") ? [
       "workspaces",
       "foreach",
       "--verbose",

@@ -102,7 +102,7 @@ export async function runPublish({
 
   let changesetPublishResult = await getExecOutput(
     "yarn",
-    semver.lte(versionResult.stdout, "4.0.0")
+    semver.gte(versionResult.stdout, "4.0.0")
     ? [
       "workspaces",
       "foreach",
