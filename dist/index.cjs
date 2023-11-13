@@ -7576,11 +7576,11 @@ var require_semver = __commonJS({
       return compare(a, b, loose) >= 0;
     }
     __name(gte, "gte");
-    exports.lte = lte;
-    function lte(a, b, loose) {
+    exports.lte = lte2;
+    function lte2(a, b, loose) {
       return compare(a, b, loose) <= 0;
     }
-    __name(lte, "lte");
+    __name(lte2, "lte");
     exports.cmp = cmp;
     function cmp(a, op, b, loose) {
       switch (op) {
@@ -7609,7 +7609,7 @@ var require_semver = __commonJS({
         case "<":
           return lt2(a, b, loose);
         case "<=":
-          return lte(a, b, loose);
+          return lte2(a, b, loose);
         default:
           throw new TypeError("Invalid operator: " + op);
       }
@@ -8136,7 +8136,7 @@ var require_semver = __commonJS({
       switch (hilo) {
         case ">":
           gtfn = gt;
-          ltefn = lte;
+          ltefn = lte2;
           ltfn = lt2;
           comp = ">";
           ecomp = ">=";
@@ -14740,9 +14740,9 @@ var require_github = __commonJS({
   }
 });
 
-// node_modules/regenerator-runtime/runtime.js
+// node_modules/@manypkg/get-packages/node_modules/regenerator-runtime/runtime.js
 var require_runtime = __commonJS({
-  "node_modules/regenerator-runtime/runtime.js"(exports, module2) {
+  "node_modules/@manypkg/get-packages/node_modules/regenerator-runtime/runtime.js"(exports, module2) {
     var runtime = function(exports2) {
       "use strict";
       var Op = Object.prototype;
@@ -25356,10 +25356,515 @@ var require_read_yaml_file = __commonJS({
   }
 });
 
+// node_modules/@manypkg/find-root/node_modules/regenerator-runtime/runtime.js
+var require_runtime2 = __commonJS({
+  "node_modules/@manypkg/find-root/node_modules/regenerator-runtime/runtime.js"(exports, module2) {
+    var runtime = function(exports2) {
+      "use strict";
+      var Op = Object.prototype;
+      var hasOwn = Op.hasOwnProperty;
+      var undefined2;
+      var $Symbol = typeof Symbol === "function" ? Symbol : {};
+      var iteratorSymbol = $Symbol.iterator || "@@iterator";
+      var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+      var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+      function wrap2(innerFn, outerFn, self2, tryLocsList) {
+        var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+        var generator = Object.create(protoGenerator.prototype);
+        var context2 = new Context(tryLocsList || []);
+        generator._invoke = makeInvokeMethod(innerFn, self2, context2);
+        return generator;
+      }
+      __name(wrap2, "wrap");
+      exports2.wrap = wrap2;
+      function tryCatch(fn, obj, arg) {
+        try {
+          return { type: "normal", arg: fn.call(obj, arg) };
+        } catch (err) {
+          return { type: "throw", arg: err };
+        }
+      }
+      __name(tryCatch, "tryCatch");
+      var GenStateSuspendedStart = "suspendedStart";
+      var GenStateSuspendedYield = "suspendedYield";
+      var GenStateExecuting = "executing";
+      var GenStateCompleted = "completed";
+      var ContinueSentinel = {};
+      function Generator() {
+      }
+      __name(Generator, "Generator");
+      function GeneratorFunction() {
+      }
+      __name(GeneratorFunction, "GeneratorFunction");
+      function GeneratorFunctionPrototype() {
+      }
+      __name(GeneratorFunctionPrototype, "GeneratorFunctionPrototype");
+      var IteratorPrototype = {};
+      IteratorPrototype[iteratorSymbol] = function() {
+        return this;
+      };
+      var getProto = Object.getPrototypeOf;
+      var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+      if (NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+        IteratorPrototype = NativeIteratorPrototype;
+      }
+      var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype);
+      GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+      GeneratorFunctionPrototype.constructor = GeneratorFunction;
+      GeneratorFunctionPrototype[toStringTagSymbol] = GeneratorFunction.displayName = "GeneratorFunction";
+      function defineIteratorMethods(prototype) {
+        ["next", "throw", "return"].forEach(function(method) {
+          prototype[method] = function(arg) {
+            return this._invoke(method, arg);
+          };
+        });
+      }
+      __name(defineIteratorMethods, "defineIteratorMethods");
+      exports2.isGeneratorFunction = function(genFun) {
+        var ctor = typeof genFun === "function" && genFun.constructor;
+        return ctor ? ctor === GeneratorFunction || // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction" : false;
+      };
+      exports2.mark = function(genFun) {
+        if (Object.setPrototypeOf) {
+          Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+        } else {
+          genFun.__proto__ = GeneratorFunctionPrototype;
+          if (!(toStringTagSymbol in genFun)) {
+            genFun[toStringTagSymbol] = "GeneratorFunction";
+          }
+        }
+        genFun.prototype = Object.create(Gp);
+        return genFun;
+      };
+      exports2.awrap = function(arg) {
+        return { __await: arg };
+      };
+      function AsyncIterator(generator, PromiseImpl) {
+        function invoke(method, arg, resolve, reject) {
+          var record = tryCatch(generator[method], generator, arg);
+          if (record.type === "throw") {
+            reject(record.arg);
+          } else {
+            var result = record.arg;
+            var value = result.value;
+            if (value && typeof value === "object" && hasOwn.call(value, "__await")) {
+              return PromiseImpl.resolve(value.__await).then(function(value2) {
+                invoke("next", value2, resolve, reject);
+              }, function(err) {
+                invoke("throw", err, resolve, reject);
+              });
+            }
+            return PromiseImpl.resolve(value).then(function(unwrapped) {
+              result.value = unwrapped;
+              resolve(result);
+            }, function(error) {
+              return invoke("throw", error, resolve, reject);
+            });
+          }
+        }
+        __name(invoke, "invoke");
+        var previousPromise;
+        function enqueue(method, arg) {
+          function callInvokeWithMethodAndArg() {
+            return new PromiseImpl(function(resolve, reject) {
+              invoke(method, arg, resolve, reject);
+            });
+          }
+          __name(callInvokeWithMethodAndArg, "callInvokeWithMethodAndArg");
+          return previousPromise = // If enqueue has been called before, then we want to wait until
+          // all previous Promises have been resolved before calling invoke,
+          // so that results are always delivered in the correct order. If
+          // enqueue has not been called before, then it is important to
+          // call invoke immediately, without waiting on a callback to fire,
+          // so that the async generator function has the opportunity to do
+          // any necessary setup in a predictable way. This predictability
+          // is why the Promise constructor synchronously invokes its
+          // executor callback, and why async functions synchronously
+          // execute code before the first await. Since we implement simple
+          // async functions in terms of async generators, it is especially
+          // important to get this right, even though it requires care.
+          previousPromise ? previousPromise.then(
+            callInvokeWithMethodAndArg,
+            // Avoid propagating failures to Promises returned by later
+            // invocations of the iterator.
+            callInvokeWithMethodAndArg
+          ) : callInvokeWithMethodAndArg();
+        }
+        __name(enqueue, "enqueue");
+        this._invoke = enqueue;
+      }
+      __name(AsyncIterator, "AsyncIterator");
+      defineIteratorMethods(AsyncIterator.prototype);
+      AsyncIterator.prototype[asyncIteratorSymbol] = function() {
+        return this;
+      };
+      exports2.AsyncIterator = AsyncIterator;
+      exports2.async = function(innerFn, outerFn, self2, tryLocsList, PromiseImpl) {
+        if (PromiseImpl === void 0)
+          PromiseImpl = Promise;
+        var iter = new AsyncIterator(
+          wrap2(innerFn, outerFn, self2, tryLocsList),
+          PromiseImpl
+        );
+        return exports2.isGeneratorFunction(outerFn) ? iter : iter.next().then(function(result) {
+          return result.done ? result.value : iter.next();
+        });
+      };
+      function makeInvokeMethod(innerFn, self2, context2) {
+        var state = GenStateSuspendedStart;
+        return /* @__PURE__ */ __name(function invoke(method, arg) {
+          if (state === GenStateExecuting) {
+            throw new Error("Generator is already running");
+          }
+          if (state === GenStateCompleted) {
+            if (method === "throw") {
+              throw arg;
+            }
+            return doneResult();
+          }
+          context2.method = method;
+          context2.arg = arg;
+          while (true) {
+            var delegate = context2.delegate;
+            if (delegate) {
+              var delegateResult = maybeInvokeDelegate(delegate, context2);
+              if (delegateResult) {
+                if (delegateResult === ContinueSentinel)
+                  continue;
+                return delegateResult;
+              }
+            }
+            if (context2.method === "next") {
+              context2.sent = context2._sent = context2.arg;
+            } else if (context2.method === "throw") {
+              if (state === GenStateSuspendedStart) {
+                state = GenStateCompleted;
+                throw context2.arg;
+              }
+              context2.dispatchException(context2.arg);
+            } else if (context2.method === "return") {
+              context2.abrupt("return", context2.arg);
+            }
+            state = GenStateExecuting;
+            var record = tryCatch(innerFn, self2, context2);
+            if (record.type === "normal") {
+              state = context2.done ? GenStateCompleted : GenStateSuspendedYield;
+              if (record.arg === ContinueSentinel) {
+                continue;
+              }
+              return {
+                value: record.arg,
+                done: context2.done
+              };
+            } else if (record.type === "throw") {
+              state = GenStateCompleted;
+              context2.method = "throw";
+              context2.arg = record.arg;
+            }
+          }
+        }, "invoke");
+      }
+      __name(makeInvokeMethod, "makeInvokeMethod");
+      function maybeInvokeDelegate(delegate, context2) {
+        var method = delegate.iterator[context2.method];
+        if (method === undefined2) {
+          context2.delegate = null;
+          if (context2.method === "throw") {
+            if (delegate.iterator["return"]) {
+              context2.method = "return";
+              context2.arg = undefined2;
+              maybeInvokeDelegate(delegate, context2);
+              if (context2.method === "throw") {
+                return ContinueSentinel;
+              }
+            }
+            context2.method = "throw";
+            context2.arg = new TypeError(
+              "The iterator does not provide a 'throw' method"
+            );
+          }
+          return ContinueSentinel;
+        }
+        var record = tryCatch(method, delegate.iterator, context2.arg);
+        if (record.type === "throw") {
+          context2.method = "throw";
+          context2.arg = record.arg;
+          context2.delegate = null;
+          return ContinueSentinel;
+        }
+        var info = record.arg;
+        if (!info) {
+          context2.method = "throw";
+          context2.arg = new TypeError("iterator result is not an object");
+          context2.delegate = null;
+          return ContinueSentinel;
+        }
+        if (info.done) {
+          context2[delegate.resultName] = info.value;
+          context2.next = delegate.nextLoc;
+          if (context2.method !== "return") {
+            context2.method = "next";
+            context2.arg = undefined2;
+          }
+        } else {
+          return info;
+        }
+        context2.delegate = null;
+        return ContinueSentinel;
+      }
+      __name(maybeInvokeDelegate, "maybeInvokeDelegate");
+      defineIteratorMethods(Gp);
+      Gp[toStringTagSymbol] = "Generator";
+      Gp[iteratorSymbol] = function() {
+        return this;
+      };
+      Gp.toString = function() {
+        return "[object Generator]";
+      };
+      function pushTryEntry(locs) {
+        var entry = { tryLoc: locs[0] };
+        if (1 in locs) {
+          entry.catchLoc = locs[1];
+        }
+        if (2 in locs) {
+          entry.finallyLoc = locs[2];
+          entry.afterLoc = locs[3];
+        }
+        this.tryEntries.push(entry);
+      }
+      __name(pushTryEntry, "pushTryEntry");
+      function resetTryEntry(entry) {
+        var record = entry.completion || {};
+        record.type = "normal";
+        delete record.arg;
+        entry.completion = record;
+      }
+      __name(resetTryEntry, "resetTryEntry");
+      function Context(tryLocsList) {
+        this.tryEntries = [{ tryLoc: "root" }];
+        tryLocsList.forEach(pushTryEntry, this);
+        this.reset(true);
+      }
+      __name(Context, "Context");
+      exports2.keys = function(object) {
+        var keys2 = [];
+        for (var key in object) {
+          keys2.push(key);
+        }
+        keys2.reverse();
+        return /* @__PURE__ */ __name(function next() {
+          while (keys2.length) {
+            var key2 = keys2.pop();
+            if (key2 in object) {
+              next.value = key2;
+              next.done = false;
+              return next;
+            }
+          }
+          next.done = true;
+          return next;
+        }, "next");
+      };
+      function values(iterable) {
+        if (iterable) {
+          var iteratorMethod = iterable[iteratorSymbol];
+          if (iteratorMethod) {
+            return iteratorMethod.call(iterable);
+          }
+          if (typeof iterable.next === "function") {
+            return iterable;
+          }
+          if (!isNaN(iterable.length)) {
+            var i = -1, next = /* @__PURE__ */ __name(function next2() {
+              while (++i < iterable.length) {
+                if (hasOwn.call(iterable, i)) {
+                  next2.value = iterable[i];
+                  next2.done = false;
+                  return next2;
+                }
+              }
+              next2.value = undefined2;
+              next2.done = true;
+              return next2;
+            }, "next");
+            return next.next = next;
+          }
+        }
+        return { next: doneResult };
+      }
+      __name(values, "values");
+      exports2.values = values;
+      function doneResult() {
+        return { value: undefined2, done: true };
+      }
+      __name(doneResult, "doneResult");
+      Context.prototype = {
+        constructor: Context,
+        reset: function(skipTempReset) {
+          this.prev = 0;
+          this.next = 0;
+          this.sent = this._sent = undefined2;
+          this.done = false;
+          this.delegate = null;
+          this.method = "next";
+          this.arg = undefined2;
+          this.tryEntries.forEach(resetTryEntry);
+          if (!skipTempReset) {
+            for (var name in this) {
+              if (name.charAt(0) === "t" && hasOwn.call(this, name) && !isNaN(+name.slice(1))) {
+                this[name] = undefined2;
+              }
+            }
+          }
+        },
+        stop: function() {
+          this.done = true;
+          var rootEntry = this.tryEntries[0];
+          var rootRecord = rootEntry.completion;
+          if (rootRecord.type === "throw") {
+            throw rootRecord.arg;
+          }
+          return this.rval;
+        },
+        dispatchException: function(exception) {
+          if (this.done) {
+            throw exception;
+          }
+          var context2 = this;
+          function handle2(loc, caught) {
+            record.type = "throw";
+            record.arg = exception;
+            context2.next = loc;
+            if (caught) {
+              context2.method = "next";
+              context2.arg = undefined2;
+            }
+            return !!caught;
+          }
+          __name(handle2, "handle");
+          for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+            var entry = this.tryEntries[i];
+            var record = entry.completion;
+            if (entry.tryLoc === "root") {
+              return handle2("end");
+            }
+            if (entry.tryLoc <= this.prev) {
+              var hasCatch = hasOwn.call(entry, "catchLoc");
+              var hasFinally = hasOwn.call(entry, "finallyLoc");
+              if (hasCatch && hasFinally) {
+                if (this.prev < entry.catchLoc) {
+                  return handle2(entry.catchLoc, true);
+                } else if (this.prev < entry.finallyLoc) {
+                  return handle2(entry.finallyLoc);
+                }
+              } else if (hasCatch) {
+                if (this.prev < entry.catchLoc) {
+                  return handle2(entry.catchLoc, true);
+                }
+              } else if (hasFinally) {
+                if (this.prev < entry.finallyLoc) {
+                  return handle2(entry.finallyLoc);
+                }
+              } else {
+                throw new Error("try statement without catch or finally");
+              }
+            }
+          }
+        },
+        abrupt: function(type, arg) {
+          for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+            var entry = this.tryEntries[i];
+            if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) {
+              var finallyEntry = entry;
+              break;
+            }
+          }
+          if (finallyEntry && (type === "break" || type === "continue") && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc) {
+            finallyEntry = null;
+          }
+          var record = finallyEntry ? finallyEntry.completion : {};
+          record.type = type;
+          record.arg = arg;
+          if (finallyEntry) {
+            this.method = "next";
+            this.next = finallyEntry.finallyLoc;
+            return ContinueSentinel;
+          }
+          return this.complete(record);
+        },
+        complete: function(record, afterLoc) {
+          if (record.type === "throw") {
+            throw record.arg;
+          }
+          if (record.type === "break" || record.type === "continue") {
+            this.next = record.arg;
+          } else if (record.type === "return") {
+            this.rval = this.arg = record.arg;
+            this.method = "return";
+            this.next = "end";
+          } else if (record.type === "normal" && afterLoc) {
+            this.next = afterLoc;
+          }
+          return ContinueSentinel;
+        },
+        finish: function(finallyLoc) {
+          for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+            var entry = this.tryEntries[i];
+            if (entry.finallyLoc === finallyLoc) {
+              this.complete(entry.completion, entry.afterLoc);
+              resetTryEntry(entry);
+              return ContinueSentinel;
+            }
+          }
+        },
+        "catch": function(tryLoc) {
+          for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+            var entry = this.tryEntries[i];
+            if (entry.tryLoc === tryLoc) {
+              var record = entry.completion;
+              if (record.type === "throw") {
+                var thrown = record.arg;
+                resetTryEntry(entry);
+              }
+              return thrown;
+            }
+          }
+          throw new Error("illegal catch attempt");
+        },
+        delegateYield: function(iterable, resultName, nextLoc) {
+          this.delegate = {
+            iterator: values(iterable),
+            resultName,
+            nextLoc
+          };
+          if (this.method === "next") {
+            this.arg = undefined2;
+          }
+          return ContinueSentinel;
+        }
+      };
+      return exports2;
+    }(
+      // If this script is executing as a CommonJS module, use module.exports
+      // as the regeneratorRuntime namespace. Otherwise create a new empty
+      // object. Either way, the resulting object will be used to initialize
+      // the regeneratorRuntime variable at the top of this file.
+      typeof module2 === "object" ? module2.exports : {}
+    );
+    try {
+      regeneratorRuntime = runtime;
+    } catch (accidentalStrictMode) {
+      Function("r", "regeneratorRuntime = r")(runtime);
+    }
+  }
+});
+
 // node_modules/@manypkg/find-root/node_modules/@babel/runtime/regenerator/index.js
 var require_regenerator2 = __commonJS({
   "node_modules/@manypkg/find-root/node_modules/@babel/runtime/regenerator/index.js"(exports, module2) {
-    module2.exports = require_runtime();
+    module2.exports = require_runtime2();
   }
 });
 
@@ -27571,8 +28076,8 @@ var require_gte = __commonJS({
 var require_lte = __commonJS({
   "node_modules/semver/functions/lte.js"(exports, module2) {
     var compare = require_compare();
-    var lte = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) <= 0, "lte");
-    module2.exports = lte;
+    var lte2 = /* @__PURE__ */ __name((a, b, loose) => compare(a, b, loose) <= 0, "lte");
+    module2.exports = lte2;
   }
 });
 
@@ -27584,7 +28089,7 @@ var require_cmp = __commonJS({
     var gt = require_gt();
     var gte = require_gte();
     var lt2 = require_lt();
-    var lte = require_lte();
+    var lte2 = require_lte();
     var cmp = /* @__PURE__ */ __name((a, op, b, loose) => {
       switch (op) {
         case "===":
@@ -27612,7 +28117,7 @@ var require_cmp = __commonJS({
         case "<":
           return lt2(a, b, loose);
         case "<=":
-          return lte(a, b, loose);
+          return lte2(a, b, loose);
         default:
           throw new TypeError(`Invalid operator: ${op}`);
       }
@@ -28933,7 +29438,7 @@ var require_outside = __commonJS({
     var satisfies = require_satisfies();
     var gt = require_gt();
     var lt2 = require_lt();
-    var lte = require_lte();
+    var lte2 = require_lte();
     var gte = require_gte();
     var outside = /* @__PURE__ */ __name((version, range, hilo, options) => {
       version = new SemVer(version, options);
@@ -28942,7 +29447,7 @@ var require_outside = __commonJS({
       switch (hilo) {
         case ">":
           gtfn = gt;
-          ltefn = lte;
+          ltefn = lte2;
           ltfn = lt2;
           comp = ">";
           ecomp = ">=";
@@ -31479,7 +31984,7 @@ var require_pre_cjs_prod = __commonJS({
       let preStatePath = path__default.default.resolve(cwd, ".changeset", "pre.json"), preState = await readPreState2(cwd);
       if (void 0 === preState)
         throw new errors.PreExitButNotInPreModeError();
-      await fs3.writeFile(preStatePath, JSON.stringify(_objectSpread2(_objectSpread2({}, preState), {}, {
+      await fs3.outputFile(preStatePath, JSON.stringify(_objectSpread2(_objectSpread2({}, preState), {}, {
         mode: "exit"
       }), null, 2) + "\n");
     }
@@ -31497,7 +32002,7 @@ var require_pre_cjs_prod = __commonJS({
       };
       for (let pkg of packages.packages)
         newPreState.initialVersions[pkg.packageJson.name] = pkg.packageJson.version;
-      await fs3.writeFile(preStatePath, JSON.stringify(newPreState, null, 2) + "\n");
+      await fs3.outputFile(preStatePath, JSON.stringify(newPreState, null, 2) + "\n");
     }
     __name(enterPre, "enterPre");
     exports.enterPre = enterPre, exports.exitPre = exitPre, exports.readPreState = readPreState2;
@@ -31590,7 +32095,7 @@ var require_pre_cjs_dev = __commonJS({
       if (preState === void 0) {
         throw new errors.PreExitButNotInPreModeError();
       }
-      await fs3.writeFile(preStatePath, JSON.stringify(_objectSpread2(_objectSpread2({}, preState), {}, {
+      await fs3.outputFile(preStatePath, JSON.stringify(_objectSpread2(_objectSpread2({}, preState), {}, {
         mode: "exit"
       }), null, 2) + "\n");
     }
@@ -31612,7 +32117,7 @@ var require_pre_cjs_dev = __commonJS({
       for (let pkg of packages.packages) {
         newPreState.initialVersions[pkg.packageJson.name] = pkg.packageJson.version;
       }
-      await fs3.writeFile(preStatePath, JSON.stringify(newPreState, null, 2) + "\n");
+      await fs3.outputFile(preStatePath, JSON.stringify(newPreState, null, 2) + "\n");
     }
     __name(enterPre, "enterPre");
     exports.enterPre = enterPre;
@@ -34889,7 +35394,7 @@ var require_git_cjs_prod = __commonJS({
     var getPackages3 = require_get_packages_cjs();
     var errors = require_errors_cjs();
     var isSubdir = require_is_subdir();
-    var util = require("util");
+    var micromatch = require_micromatch();
     function _interopDefault(e) {
       return e && e.__esModule ? e : {
         default: e
@@ -34900,6 +35405,7 @@ var require_git_cjs_prod = __commonJS({
     var fs__default = _interopDefault(fs3);
     var path__default = _interopDefault(path2);
     var isSubdir__default = _interopDefault(isSubdir);
+    var micromatch__default = _interopDefault(micromatch);
     async function add(pathToFile, cwd) {
       const gitCmd = await spawn__default.default("git", ["add", pathToFile], {
         cwd
@@ -34938,13 +35444,12 @@ var require_git_cjs_prod = __commonJS({
       return cmd.stdout.toString().trim();
     }
     __name(getDivergedCommit, "getDivergedCommit");
-    var getCommitThatAddsFile = util.deprecate(async (gitPath, cwd) => (await getCommitsThatAddFiles([gitPath], cwd))[0], "Use the bulk getCommitsThatAddFiles function instead");
-    async function getCommitsThatAddFiles(gitPaths, cwd) {
+    async function getCommitsThatAddFiles(gitPaths, { cwd, short = false }) {
       const map3 = /* @__PURE__ */ new Map();
       let remaining = gitPaths;
       for (; ; ) {
         const commitInfos = await Promise.all(remaining.map(async (gitPath) => {
-          const [commitSha, parentSha] = (await spawn__default.default("git", ["log", "--diff-filter=A", "--max-count=1", "--pretty=format:%h:%p", gitPath], {
+          const [commitSha, parentSha] = (await spawn__default.default("git", ["log", "--diff-filter=A", "--max-count=1", short ? "--pretty=format:%h:%p" : "--pretty=format:%H:%p", gitPath], {
             cwd
           })).stdout.toString().split(":");
           return {
@@ -34992,6 +35497,15 @@ var require_git_cjs_prod = __commonJS({
       });
     }
     __name(deepenCloneBy, "deepenCloneBy");
+    async function getRepoRoot({ cwd }) {
+      const { stdout, code: code2, stderr } = await spawn__default.default("git", ["rev-parse", "--show-toplevel"], {
+        cwd
+      });
+      if (0 !== code2)
+        throw new Error(stderr.toString());
+      return stdout.toString().trim().replace(/\n|\r/g, "");
+    }
+    __name(getRepoRoot, "getRepoRoot");
     async function getChangedFilesSince({ cwd, ref, fullPath = false }) {
       const divergedAt = await getDivergedCommit(cwd, ref), cmd = await spawn__default.default("git", ["diff", "--name-only", divergedAt], {
         cwd
@@ -34999,7 +35513,12 @@ var require_git_cjs_prod = __commonJS({
       if (0 !== cmd.code)
         throw new Error(`Failed to diff against ${divergedAt}. Is ${divergedAt} a valid ref?`);
       const files = cmd.stdout.toString().trim().split("\n").filter((a) => a);
-      return fullPath ? files.map((file) => path__default.default.resolve(cwd, file)) : files;
+      if (!fullPath)
+        return files;
+      const repoRoot = await getRepoRoot({
+        cwd
+      });
+      return files.map((file) => path__default.default.resolve(repoRoot, file));
     }
     __name(getChangedFilesSince, "getChangedFilesSince");
     async function getChangedChangesetFilesSinceRef({ cwd, ref }) {
@@ -35016,26 +35535,43 @@ var require_git_cjs_prod = __commonJS({
       }
     }
     __name(getChangedChangesetFilesSinceRef, "getChangedChangesetFilesSinceRef");
-    async function getChangedPackagesSinceRef({ cwd, ref }) {
+    async function getChangedPackagesSinceRef({ cwd, ref, changedFilePatterns = ["**"] }) {
       const changedFiles = await getChangedFilesSince({
         ref,
         cwd,
         fullPath: true
       });
-      let packages = await getPackages3.getPackages(cwd);
-      const fileToPackage = {};
-      return packages.packages.forEach((pkg) => {
-        return changedFiles.filter((dir = pkg.dir, (subdir) => isSubdir__default.default(dir, subdir))).forEach((fileName) => {
-          const prevPkg = fileToPackage[fileName] || {
-            dir: ""
-          };
-          pkg.dir.length > prevPkg.dir.length && (fileToPackage[fileName] = pkg);
-        });
-        var dir;
-      }), Object.values(fileToPackage).filter((pkg, idx, packages2) => packages2.indexOf(pkg) === idx);
+      return [...(await getPackages3.getPackages(cwd)).packages].sort((pkgA, pkgB) => pkgB.dir.length - pkgA.dir.length).filter((pkg) => {
+        const changedPackageFiles = [];
+        for (let i = changedFiles.length - 1; i >= 0; i--) {
+          const file = changedFiles[i];
+          if (isSubdir__default.default(pkg.dir, file)) {
+            changedFiles.splice(i, 1);
+            const relativeFile = file.slice(pkg.dir.length + 1);
+            changedPackageFiles.push(relativeFile);
+          }
+        }
+        return changedPackageFiles.length > 0 && micromatch__default.default(changedPackageFiles, changedFilePatterns).length > 0;
+      });
     }
     __name(getChangedPackagesSinceRef, "getChangedPackagesSinceRef");
-    exports.add = add, exports.commit = commit, exports.deepenCloneBy = deepenCloneBy, exports.getAllTags = getAllTags, exports.getChangedChangesetFilesSinceRef = getChangedChangesetFilesSinceRef, exports.getChangedFilesSince = getChangedFilesSince, exports.getChangedPackagesSinceRef = getChangedPackagesSinceRef, exports.getCommitThatAddsFile = getCommitThatAddsFile, exports.getCommitsThatAddFiles = getCommitsThatAddFiles, exports.getDivergedCommit = getDivergedCommit, exports.isRepoShallow = isRepoShallow, exports.tag = tag;
+    async function tagExists(tagStr, cwd) {
+      return !!(await spawn__default.default("git", ["tag", "-l", tagStr], {
+        cwd
+      })).stdout.toString().trim();
+    }
+    __name(tagExists, "tagExists");
+    async function getCurrentCommitId({ cwd, short = false }) {
+      return (await spawn__default.default("git", ["rev-parse", short && "--short", "HEAD"].filter(Boolean), {
+        cwd
+      })).stdout.toString().trim();
+    }
+    __name(getCurrentCommitId, "getCurrentCommitId");
+    async function remoteTagExists(tagStr) {
+      return !!(await spawn__default.default("git", ["ls-remote", "--tags", "origin", "-l", tagStr])).stdout.toString().trim();
+    }
+    __name(remoteTagExists, "remoteTagExists");
+    exports.add = add, exports.commit = commit, exports.deepenCloneBy = deepenCloneBy, exports.getAllTags = getAllTags, exports.getChangedChangesetFilesSinceRef = getChangedChangesetFilesSinceRef, exports.getChangedFilesSince = getChangedFilesSince, exports.getChangedPackagesSinceRef = getChangedPackagesSinceRef, exports.getCommitsThatAddFiles = getCommitsThatAddFiles, exports.getCurrentCommitId = getCurrentCommitId, exports.getDivergedCommit = getDivergedCommit, exports.isRepoShallow = isRepoShallow, exports.remoteTagExists = remoteTagExists, exports.tag = tag, exports.tagExists = tagExists;
   }
 });
 
@@ -35050,7 +35586,7 @@ var require_git_cjs_dev = __commonJS({
     var getPackages3 = require_get_packages_cjs();
     var errors = require_errors_cjs();
     var isSubdir = require_is_subdir();
-    var util = require("util");
+    var micromatch = require_micromatch();
     function _interopDefault(e) {
       return e && e.__esModule ? e : { "default": e };
     }
@@ -35059,7 +35595,7 @@ var require_git_cjs_dev = __commonJS({
     var fs__default = /* @__PURE__ */ _interopDefault(fs3);
     var path__default = /* @__PURE__ */ _interopDefault(path2);
     var isSubdir__default = /* @__PURE__ */ _interopDefault(isSubdir);
-    var isInDir = /* @__PURE__ */ __name((dir) => (subdir) => isSubdir__default["default"](dir, subdir), "isInDir");
+    var micromatch__default = /* @__PURE__ */ _interopDefault(micromatch);
     async function add(pathToFile, cwd) {
       const gitCmd = await spawn__default["default"]("git", ["add", pathToFile], {
         cwd
@@ -35105,15 +35641,15 @@ var require_git_cjs_dev = __commonJS({
       return cmd.stdout.toString().trim();
     }
     __name(getDivergedCommit, "getDivergedCommit");
-    var getCommitThatAddsFile = util.deprecate(async (gitPath, cwd) => {
-      return (await getCommitsThatAddFiles([gitPath], cwd))[0];
-    }, "Use the bulk getCommitsThatAddFiles function instead");
-    async function getCommitsThatAddFiles(gitPaths, cwd) {
+    async function getCommitsThatAddFiles(gitPaths, {
+      cwd,
+      short = false
+    }) {
       const map3 = /* @__PURE__ */ new Map();
       let remaining = gitPaths;
       do {
         const commitInfos = await Promise.all(remaining.map(async (gitPath) => {
-          const [commitSha, parentSha] = (await spawn__default["default"]("git", ["log", "--diff-filter=A", "--max-count=1", "--pretty=format:%h:%p", gitPath], {
+          const [commitSha, parentSha] = (await spawn__default["default"]("git", ["log", "--diff-filter=A", "--max-count=1", short ? "--pretty=format:%h:%p" : "--pretty=format:%H:%p", gitPath], {
             cwd
           })).stdout.toString().split(":");
           return {
@@ -35179,6 +35715,22 @@ var require_git_cjs_dev = __commonJS({
       });
     }
     __name(deepenCloneBy, "deepenCloneBy");
+    async function getRepoRoot({
+      cwd
+    }) {
+      const {
+        stdout,
+        code: code2,
+        stderr
+      } = await spawn__default["default"]("git", ["rev-parse", "--show-toplevel"], {
+        cwd
+      });
+      if (code2 !== 0) {
+        throw new Error(stderr.toString());
+      }
+      return stdout.toString().trim().replace(/\n|\r/g, "");
+    }
+    __name(getRepoRoot, "getRepoRoot");
     async function getChangedFilesSince({
       cwd,
       ref,
@@ -35194,7 +35746,10 @@ var require_git_cjs_dev = __commonJS({
       const files = cmd.stdout.toString().trim().split("\n").filter((a) => a);
       if (!fullPath)
         return files;
-      return files.map((file) => path__default["default"].resolve(cwd, file));
+      const repoRoot = await getRepoRoot({
+        cwd
+      });
+      return files.map((file) => path__default["default"].resolve(repoRoot, file));
     }
     __name(getChangedFilesSince, "getChangedFilesSince");
     async function getChangedChangesetFilesSinceRef({
@@ -35218,25 +35773,53 @@ var require_git_cjs_dev = __commonJS({
     __name(getChangedChangesetFilesSinceRef, "getChangedChangesetFilesSinceRef");
     async function getChangedPackagesSinceRef({
       cwd,
-      ref
+      ref,
+      changedFilePatterns = ["**"]
     }) {
       const changedFiles = await getChangedFilesSince({
         ref,
         cwd,
         fullPath: true
       });
-      let packages = await getPackages3.getPackages(cwd);
-      const fileToPackage = {};
-      packages.packages.forEach((pkg) => changedFiles.filter(isInDir(pkg.dir)).forEach((fileName) => {
-        const prevPkg = fileToPackage[fileName] || {
-          dir: ""
-        };
-        if (pkg.dir.length > prevPkg.dir.length)
-          fileToPackage[fileName] = pkg;
-      }));
-      return Object.values(fileToPackage).filter((pkg, idx, packages2) => packages2.indexOf(pkg) === idx);
+      return [...(await getPackages3.getPackages(cwd)).packages].sort((pkgA, pkgB) => pkgB.dir.length - pkgA.dir.length).filter((pkg) => {
+        const changedPackageFiles = [];
+        for (let i = changedFiles.length - 1; i >= 0; i--) {
+          const file = changedFiles[i];
+          if (isSubdir__default["default"](pkg.dir, file)) {
+            changedFiles.splice(i, 1);
+            const relativeFile = file.slice(pkg.dir.length + 1);
+            changedPackageFiles.push(relativeFile);
+          }
+        }
+        return changedPackageFiles.length > 0 && micromatch__default["default"](changedPackageFiles, changedFilePatterns).length > 0;
+      });
     }
     __name(getChangedPackagesSinceRef, "getChangedPackagesSinceRef");
+    async function tagExists(tagStr, cwd) {
+      const gitCmd = await spawn__default["default"]("git", ["tag", "-l", tagStr], {
+        cwd
+      });
+      const output = gitCmd.stdout.toString().trim();
+      const tagExists2 = !!output;
+      return tagExists2;
+    }
+    __name(tagExists, "tagExists");
+    async function getCurrentCommitId({
+      cwd,
+      short = false
+    }) {
+      return (await spawn__default["default"]("git", ["rev-parse", short && "--short", "HEAD"].filter(Boolean), {
+        cwd
+      })).stdout.toString().trim();
+    }
+    __name(getCurrentCommitId, "getCurrentCommitId");
+    async function remoteTagExists(tagStr) {
+      const gitCmd = await spawn__default["default"]("git", ["ls-remote", "--tags", "origin", "-l", tagStr]);
+      const output = gitCmd.stdout.toString().trim();
+      const tagExists2 = !!output;
+      return tagExists2;
+    }
+    __name(remoteTagExists, "remoteTagExists");
     exports.add = add;
     exports.commit = commit;
     exports.deepenCloneBy = deepenCloneBy;
@@ -35244,11 +35827,13 @@ var require_git_cjs_dev = __commonJS({
     exports.getChangedChangesetFilesSinceRef = getChangedChangesetFilesSinceRef;
     exports.getChangedFilesSince = getChangedFilesSince;
     exports.getChangedPackagesSinceRef = getChangedPackagesSinceRef;
-    exports.getCommitThatAddsFile = getCommitThatAddsFile;
     exports.getCommitsThatAddFiles = getCommitsThatAddFiles;
+    exports.getCurrentCommitId = getCurrentCommitId;
     exports.getDivergedCommit = getDivergedCommit;
     exports.isRepoShallow = isRepoShallow;
+    exports.remoteTagExists = remoteTagExists;
     exports.tag = tag;
+    exports.tagExists = tagExists;
   }
 });
 
@@ -37265,7 +37850,7 @@ var require_package = __commonJS({
   "node_modules/@changesets/cli/package.json"(exports, module2) {
     module2.exports = {
       name: "@changesets/cli",
-      version: "2.20.0",
+      version: "2.26.1",
       description: "Organise your package versioning and publishing to make both contributors and maintainers happy",
       bin: {
         changeset: "bin.js"
@@ -37275,7 +37860,8 @@ var require_package = __commonJS({
         "default-files",
         "dist",
         "bin.js",
-        "changelog"
+        "changelog",
+        "commit"
       ],
       main: "dist/cli.cjs.js",
       module: "dist/cli.esm.js",
@@ -37288,27 +37874,30 @@ var require_package = __commonJS({
       preconstruct: {
         entrypoints: [
           ".",
-          "changelog"
+          "changelog",
+          "commit"
         ]
       },
       license: "MIT",
       dependencies: {
-        "@babel/runtime": "^7.10.4",
-        "@changesets/apply-release-plan": "^5.0.4",
-        "@changesets/assemble-release-plan": "^5.0.5",
-        "@changesets/config": "^1.6.4",
+        "@babel/runtime": "^7.20.1",
+        "@changesets/apply-release-plan": "^6.1.3",
+        "@changesets/assemble-release-plan": "^5.2.3",
+        "@changesets/changelog-git": "^0.1.14",
+        "@changesets/config": "^2.3.0",
         "@changesets/errors": "^0.1.4",
-        "@changesets/get-dependents-graph": "^1.3.0",
-        "@changesets/get-release-plan": "^3.0.5",
-        "@changesets/git": "^1.3.0",
+        "@changesets/get-dependents-graph": "^1.3.5",
+        "@changesets/get-release-plan": "^3.0.16",
+        "@changesets/git": "^2.0.0",
         "@changesets/logger": "^0.0.5",
-        "@changesets/pre": "^1.0.9",
-        "@changesets/read": "^0.5.3",
-        "@changesets/types": "^4.0.2",
-        "@changesets/write": "^0.1.6",
+        "@changesets/pre": "^1.0.14",
+        "@changesets/read": "^0.5.9",
+        "@changesets/types": "^5.2.1",
+        "@changesets/write": "^0.2.3",
         "@manypkg/get-packages": "^1.1.3",
         "@types/is-ci": "^3.0.0",
         "@types/semver": "^6.0.0",
+        "ansi-colors": "^4.1.3",
         chalk: "^2.1.0",
         enquirer: "^2.3.0",
         "external-editor": "^3.1.0",
@@ -37319,15 +37908,15 @@ var require_package = __commonJS({
         outdent: "^0.5.0",
         "p-limit": "^2.2.0",
         "preferred-pm": "^3.0.0",
+        "resolve-from": "^5.0.0",
         semver: "^5.4.1",
         spawndamnit: "^2.0.0",
         "term-size": "^2.1.0",
-        "tty-table": "^2.8.10"
+        "tty-table": "^4.1.5"
       },
       devDependencies: {
         "@changesets/parse": "*",
         "@changesets/test-utils": "*",
-        fixturez: "^1.1.0",
         "strip-ansi": "^5.2.0"
       }
     };
@@ -47291,12 +47880,28 @@ async function runPublish({
     ],
     { cwd }
   );
-  let changesetPublishOutput = await (0, import_exec2.getExecOutput)(
+  let versionResult = await (0, import_exec2.getExecOutput)("yarn", ["--version"]);
+  if (versionResult.exitCode !== 0) {
+    throw new Error(versionResult.stderr);
+  }
+  let changesetPublishResult = await (0, import_exec2.getExecOutput)(
     "yarn",
-    [
+    semver.lte(versionResult.stdout, "4.0.0") ? [
       "workspaces",
       "foreach",
-      "-iv",
+      "--verbose",
+      "--worktree",
+      "--interlaced",
+      "--topological-dev",
+      "--no-private",
+      "npm",
+      "publish",
+      "--tolerate-republish"
+    ] : [
+      "workspaces",
+      "foreach",
+      "--verbose",
+      "--interlaced",
       "--topological-dev",
       "--no-private",
       "npm",
@@ -47305,10 +47910,13 @@ async function runPublish({
     ],
     { cwd }
   );
+  if (changesetPublishResult.exitCode !== 0) {
+    throw new Error(changesetPublishResult.stderr);
+  }
   let { packages } = await (0, import_get_packages2.getPackages)(cwd);
   let publishedPattern = /\[(?<packageName>[^\[]+)\]:.*Package archive published/;
   let publishedPackages = [];
-  let lines = changesetPublishOutput.stdout.split("\n");
+  let lines = changesetPublishResult.stdout.split("\n");
   for (let line of lines) {
     let packageName = (_b = (_a = line.match(publishedPattern)) == null ? void 0 : _a.groups) == null ? void 0 : _b["packageName"];
     let pkg = packages.find((pkg2) => pkg2.packageJson.name === packageName);

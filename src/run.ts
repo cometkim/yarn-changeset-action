@@ -95,12 +95,30 @@ export async function runPublish({
     { cwd },
   );
 
-  let changesetPublishOutput = await getExecOutput(
+  let versionResult = await getExecOutput("yarn", ["--version"]);
+  if (versionResult.exitCode !== 0) {
+    throw new Error(versionResult.stderr);
+  }
+
+  let changesetPublishResult = await getExecOutput(
     "yarn",
-    [
+    semver.lte(versionResult.stdout, "4.0.0")
+    ? [
       "workspaces",
       "foreach",
-      "-iv",
+      "--verbose",
+      "--worktree",
+      "--interlaced",
+      "--topological-dev",
+      "--no-private",
+      "npm",
+      "publish",
+      "--tolerate-republish",
+    ] : [
+      "workspaces",
+      "foreach",
+      "--verbose",
+      "--interlaced",
       "--topological-dev",
       "--no-private",
       "npm",
@@ -109,13 +127,16 @@ export async function runPublish({
     ],
     { cwd },
   );
+  if (changesetPublishResult.exitCode !== 0) {
+    throw new Error(changesetPublishResult.stderr);
+  }
 
   let { packages } = await getPackages(cwd);
 
   let publishedPattern = /\[(?<packageName>[^\[]+)\]:.*Package archive published/;
   let publishedPackages: Package[] = [];
 
-  let lines = changesetPublishOutput.stdout.split("\n");
+  let lines = changesetPublishResult.stdout.split("\n");
   for (let line of lines) {
     let packageName = line.match(publishedPattern)?.groups?.['packageName'];
     let pkg = packages.find(pkg => pkg.packageJson.name === packageName);
