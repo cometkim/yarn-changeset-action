@@ -1,4 +1,4 @@
-name: Changesets
+name: Changesets for Yarn 2+
 description: A GitHub action to automate releases with Changesets
 runs:
   using: "node16"
@@ -7,11 +7,11 @@ inputs:
   autoPublish:
     description: "A boolean value to enable auto publishing"
     required: false
-    default: false
+    default: "false"
   dedupe:
     description: "A boolean value to enable auto deduplication"
     required: false
-    default: false
+    default: "false"
   cwd:
     description: Sets the cwd for the node process. Default to `process.cwd()`
     required: false
@@ -27,11 +27,11 @@ inputs:
   setupGitUser:
     description: Sets up the git user for commits as `"github-actions[bot]"`. Default to `true`
     required: false
-    default: true
+    default: "true"
   createGithubReleases:
     description: "A boolean value to indicate whether to create Github releases after `publish` or not"
     required: false
-    default: true
+    default: "true"
 outputs:
   published:
     description: A boolean value to indicate whether a publishing is happened or not
