@@ -55,6 +55,7 @@ const createRelease = async (
 };
 
 type PublishOptions = {
+  cwd: string;
   npmToken: string;
   githubToken: string;
   createGithubReleases: boolean;
@@ -72,11 +73,11 @@ type PublishResult =
     };
 
 export async function runPublish({
+  cwd,
   npmToken,
   githubToken,
   createGithubReleases,
 }: PublishOptions): Promise<PublishResult> {
-  let cwd = process.cwd();
   let octokit = github.getOctokit(githubToken);
 
   let { tool } = await getPackages(cwd);
@@ -95,14 +96,14 @@ export async function runPublish({
     { cwd },
   );
 
-  let versionResult = await getExecOutput("yarn", ["--version"]);
-  if (versionResult.exitCode !== 0) {
-    throw new Error(versionResult.stderr);
+  let yarnVersionResult = await getExecOutput("yarn", ["--version"], { cwd });
+  if (yarnVersionResult.exitCode !== 0) {
+    throw new Error(yarnVersionResult.stderr);
   }
 
   let changesetPublishResult = await getExecOutput(
     "yarn",
-    semver.gte(versionResult.stdout, "4.0.0")
+    semver.gte(yarnVersionResult.stdout, "4.0.0")
     ? [
       "workspaces",
       "foreach",
@@ -168,19 +169,6 @@ export async function runPublish({
 
   return { published: false };
 }
-
-const requireChangesetsCliPkgJson = () => {
-  try {
-    return require("@changesets/cli/package.json");
-  } catch (err: any) {
-    if (err?.code === "MODULE_NOT_FOUND") {
-      throw new Error(
-        `Have you forgotten to install \`@changesets/cli\` in "${process.cwd()}"?`
-      );
-    }
-    throw err;
-  }
-};
 
 type ChangedPackageInfo = ChangelogEntry & {
   private: boolean;
@@ -252,6 +240,7 @@ export async function getVersionPrBody({
 }
 
 type VersionOptions = {
+  cwd: string;
   githubToken: string;
   prTitle?: string;
   commitMessage?: string;
@@ -265,6 +254,7 @@ type RunVersionResult = {
 };
 
 export async function runVersion({
+  cwd,
   githubToken,
   prTitle = "Version Packages",
   commitMessage = "Version Packages",
@@ -272,8 +262,6 @@ export async function runVersion({
   dedupe = false,
   prBodyMaxCharacters = MAX_CHARACTERS_PER_MESSAGE,
 }: VersionOptions): Promise<RunVersionResult> {
-  let cwd = process.cwd();
-
   let repo = `${github.context.repo.owner}/${github.context.repo.repo}`;
   let branch = github.context.ref.replace("refs/heads/", "");
   let versionBranch = `changeset-release/${branch}`;
@@ -285,10 +273,19 @@ export async function runVersion({
 
   let versionsByDirectory = await getVersionsByDirectory(cwd);
 
-  let changesetsCliPkgJson = requireChangesetsCliPkgJson();
-    let cmd = semver.lt(changesetsCliPkgJson.version, "2.0.0")
-      ? "bump"
-      : "version";
+  let changesetVersionResult = await getExecOutput(
+    "yarn",
+    ["changeset", "--version"],
+    { cwd },
+  );
+  if (changesetVersionResult.exitCode !== 0) {
+    throw new Error(
+      `Have you forgotten to install \`@changesets/cli\` in "${cwd}"?`
+    );
+  }
+  let cmd = semver.lt(changesetVersionResult.stdout, "2.0.0")
+    ? "bump"
+    : "version";
   await exec("yarn", ["changeset", cmd], { cwd });
 
   // update lock file

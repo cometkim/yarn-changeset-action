@@ -13,7 +13,7 @@ inputs:
     required: false
     default: "false"
   cwd:
-    description: Sets the cwd for the node process. Default to `process.cwd()`
+    description: Sets the cwd for the Yarn project. Default to `process.cwd()`
     required: false
   commit:
     description: |

@@ -1,4 +1,5 @@
 import * as core from "@actions/core";
+import * as path from "node:path";
 import fs from "fs-extra";
 import * as gitUtils from "./gitUtils";
 import { runPublish, runVersion } from "./run";
@@ -28,11 +29,10 @@ const getOptionalInput = (name: string) => core.getInput(name) || undefined;
     `machine github.com\nlogin github-actions[bot]\npassword ${githubToken}`
   );
 
-  const inputCwd = core.getInput("cwd");
-  if (inputCwd) {
-    console.log("changing directory to the one given as the input");
-    process.chdir(inputCwd);
-  }
+  let inputCwd = core.getInput("cwd");
+  let resolvedCwd = path.isAbsolute(inputCwd)
+    ? inputCwd
+    : path.resolve(process.cwd(), inputCwd);
 
   let { changesets } = await readChangesetState();
 
@@ -51,6 +51,7 @@ const getOptionalInput = (name: string) => core.getInput(name) || undefined;
   if (hasChangesets) {
     if (hasNonEmptyChangesets) {
       const { pullRequestNumber } = await runVersion({
+        cwd: resolvedCwd,
         githubToken,
         prTitle: getOptionalInput("title"),
         commitMessage: getOptionalInput("commit"),
@@ -75,6 +76,7 @@ const getOptionalInput = (name: string) => core.getInput(name) || undefined;
       console.log("Attempting to publish any unpublished packages to npm");
 
       const result = await runPublish({
+        cwd: resolvedCwd,
         npmToken,
         githubToken,
         createGithubReleases: core.getBooleanInput("createGithubReleases"),
