@@ -34,7 +34,7 @@ const getOptionalInput = (name: string) => core.getInput(name) || undefined;
     ? inputCwd
     : path.resolve(process.cwd(), inputCwd);
 
-  let { changesets } = await readChangesetState();
+  let { changesets } = await readChangesetState(resolvedCwd);
 
   let autoPublish = core.getBooleanInput("autoPublish");
   let dedupe = core.getBooleanInput("dedupe");

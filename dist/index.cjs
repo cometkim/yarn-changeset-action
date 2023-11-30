@@ -47741,11 +47741,11 @@ __name(sortTheThings, "sortTheThings");
 // src/readChangesetState.ts
 var import_pre = __toESM(require_pre_cjs());
 var import_read = __toESM(require_read_cjs());
-async function readChangesetState(cwd = process.cwd()) {
+async function readChangesetState(cwd) {
   let preState = await (0, import_pre.readPreState)(cwd);
   let isInPreMode = preState !== void 0 && preState.mode === "pre";
   let changesets = await (0, import_read.default)(cwd);
-  if (isInPreMode) {
+  if (isInPreMode && preState) {
     let changesetsToFilter = new Set(preState.changesets);
     changesets = changesets.filter((x) => !changesetsToFilter.has(x.id));
   }
@@ -48040,7 +48040,7 @@ password ${githubToken}`
   );
   let inputCwd = core.getInput("cwd");
   let resolvedCwd = path2.isAbsolute(inputCwd) ? inputCwd : path2.resolve(process.cwd(), inputCwd);
-  let { changesets } = await readChangesetState();
+  let { changesets } = await readChangesetState(resolvedCwd);
   let autoPublish = core.getBooleanInput("autoPublish");
   let dedupe = core.getBooleanInput("dedupe");
   let hasChangesets = changesets.length !== 0;
