@@ -81,7 +81,7 @@ export async function runPublish({
   let octokit = github.getOctokit(githubToken);
 
   let { tool } = await getPackages(cwd);
-  if (tool !== "yarn") {
+  if (tool.type !== "yarn" && tool.type !== "root") {
     throw new Error("Only Yarn is supported");
   }
 
