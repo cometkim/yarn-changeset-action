@@ -275,7 +275,7 @@ export async function runVersion({
 
   let changesetVersionResult = await getExecOutput(
     "yarn",
-    ["changeset", "--version"],
+    ["info", "@changesets/cli", "--json"],
     { cwd },
   );
   if (changesetVersionResult.exitCode !== 0) {
@@ -283,7 +283,8 @@ export async function runVersion({
       `Have you forgotten to install \`@changesets/cli\` in "${cwd}"?`
     );
   }
-  let cmd = semver.lt(changesetVersionResult.stdout, "2.0.0")
+  let changesetVersion = JSON.parse(changesetVersionResult.stdout)["children"]["Version"] as string;
+  let cmd = semver.lt(changesetVersion, "2.0.0")
     ? "bump"
     : "version";
   await exec("yarn", ["changeset", cmd], { cwd });

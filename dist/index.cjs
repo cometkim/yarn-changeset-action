@@ -54082,7 +54082,7 @@ async function runVersion({
   let versionsByDirectory = await getVersionsByDirectory(cwd);
   let changesetVersionResult = await (0, import_exec2.getExecOutput)(
     "yarn",
-    ["changeset", "--version"],
+    ["info", "@changesets/cli", "--json"],
     { cwd }
   );
   if (changesetVersionResult.exitCode !== 0) {
@@ -54090,7 +54090,8 @@ async function runVersion({
       `Have you forgotten to install \`@changesets/cli\` in "${cwd}"?`
     );
   }
-  let cmd = semver.lt(changesetVersionResult.stdout, "2.0.0") ? "bump" : "version";
+  let changesetVersion = JSON.parse(changesetVersionResult.stdout)["children"]["Version"];
+  let cmd = semver.lt(changesetVersion, "2.0.0") ? "bump" : "version";
   await (0, import_exec2.exec)("yarn", ["changeset", cmd], { cwd });
   await (0, import_exec2.exec)("yarn", [
     "install",
