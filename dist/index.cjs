@@ -53938,16 +53938,18 @@ async function runPublish({
   if (tool.type !== "yarn" && tool.type !== "root") {
     throw new Error("Only Yarn is supported");
   }
-  await (0, import_exec2.exec)(
-    "yarn",
-    [
-      "config",
-      "set",
-      "npmAuthToken",
-      npmToken
-    ],
-    { cwd }
-  );
+  if (npmToken) {
+    await (0, import_exec2.exec)(
+      "yarn",
+      [
+        "config",
+        "set",
+        "npmAuthToken",
+        npmToken
+      ],
+      { cwd }
+    );
+  }
   let yarnVersionResult = await (0, import_exec2.getExecOutput)("yarn", ["--version"], { cwd });
   if (yarnVersionResult.exitCode !== 0) {
     throw new Error(yarnVersionResult.stderr);
@@ -54215,10 +54217,6 @@ password ${githubToken}`
   } else {
     console.log("No changesets found");
     if (autoPublish) {
-      if (!npmToken) {
-        core.setFailed("Please add the NPM_TOKEN to the changesets action");
-        return;
-      }
       console.log("Attempting to publish any unpublished packages to npm");
       const result = await runPublish({
         cwd: resolvedCwd,

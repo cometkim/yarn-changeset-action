@@ -68,11 +68,6 @@ const getOptionalInput = (name: string) => core.getInput(name) || undefined;
     console.log("No changesets found");
 
     if (autoPublish) {
-      if (!npmToken) {
-        core.setFailed("Please add the NPM_TOKEN to the changesets action");
-        return;
-      }
-
       console.log("Attempting to publish any unpublished packages to npm");
 
       const result = await runPublish({

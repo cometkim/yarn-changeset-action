@@ -56,7 +56,7 @@ const createRelease = async (
 
 type PublishOptions = {
   cwd: string;
-  npmToken: string;
+  npmToken?: string;
   githubToken: string;
   createGithubReleases: boolean;
 };
@@ -85,16 +85,18 @@ export async function runPublish({
     throw new Error("Only Yarn is supported");
   }
 
-  await exec(
-    "yarn",
-    [
-      "config",
-      "set",
-      "npmAuthToken",
-      npmToken,
-    ],
-    { cwd },
-  );
+  if (npmToken) {
+    await exec(
+      "yarn",
+      [
+        "config",
+        "set",
+        "npmAuthToken",
+        npmToken,
+      ],
+      { cwd },
+    );
+  }
 
   let yarnVersionResult = await getExecOutput("yarn", ["--version"], { cwd });
   if (yarnVersionResult.exitCode !== 0) {
